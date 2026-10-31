@@ -77,10 +77,10 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 
 *(Phase 9 Checkpoint: Await User Configuration of GEMINI_API_KEY or GROQ_API_KEY before Phase 10)*
 
-### Phase 10 — Live LLM provider integration
-- [x] Commit 28: `Define provider abstraction and deterministic mock model`
-- [x] Commit 29: `Integrate configured Gemini and Groq adapters`
-- [ ] Commit 30: `Validate structured outputs retries and secret handling`
+### Phase 10 — Live LLM provider integration (COMPLETED)
+- [x] Commit 28 (82c2c8d): `Define provider abstraction and deterministic mock model`
+- [x] Commit 29 (8e8d0d8): `Integrate configured Gemini and Groq adapters`
+- [x] Commit 30 (76ef5bb): `Validate structured outputs retries and secret handling`
 
 ### Phase 11 — LangGraph analysis and remediation proposal workflow
 - [ ] Commit 31: `Build typed LangGraph investigation workflow`
@@ -120,5 +120,5 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 9 complete with all 27 RAG unit/integration tests passing (153/153 total backend tests passing), hybrid RRF retriever, citation validator, and empirical 52-case retrieval evaluation report generated.
-- Next: Phase 10 Live LLM Provider Integration — Requires user configuration of `GEMINI_API_KEY` or `GROQ_API_KEY` in `backend/.env` per blueprint instructions.
+- Current: Phase 10 complete with all 22 AI provider unit/integration tests passing (175/175 total backend tests passing). Google Gemini adapter integrated and verified with live Gemini API key, Groq adapter integrated, deterministic mock provider with simulated error injection, tenacity exponential retries for transient rate limits and server errors, and robust secret sanitization across all log streams.
+- Next: Phase 11 — LangGraph multi-agent analysis and remediation workflow (Commit 31: `Build typed LangGraph investigation workflow`).

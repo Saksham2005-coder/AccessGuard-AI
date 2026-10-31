@@ -53,6 +53,14 @@ class GeminiLLMProvider(LLMProvider):
     def default_model(self) -> str:
         return self._default_model
 
+    async def aclose(self) -> None:
+        """Close underlying async HTTP resources cleanly."""
+        try:
+            if hasattr(self, "_client") and hasattr(self._client, "aio"):
+                await self._client.aio.aclose()
+        except Exception:
+            pass
+
     async def generate_structured(
         self,
         *,

@@ -9,6 +9,7 @@ from app.config import Settings
 def test_default_settings_no_llm_keys_required() -> None:
     """Verify settings initialize successfully in mock mode without Gemini/Groq keys."""
     settings = Settings(
+        _env_file=None,
         APP_ENV="development",
         LLM_PROVIDER="mock",
         JWT_SECRET_KEY="dev-secret-key-that-is-valid-length",

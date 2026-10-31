@@ -57,6 +57,14 @@ class GroqLLMProvider(LLMProvider):
     def default_model(self) -> str:
         return self._default_model
 
+    async def aclose(self) -> None:
+        """Close underlying async HTTP client cleanly."""
+        try:
+            if hasattr(self, "_client") and hasattr(self._client, "close"):
+                await self._client.close()
+        except Exception:
+            pass
+
     async def generate_structured(
         self,
         *,

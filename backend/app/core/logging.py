@@ -1,6 +1,7 @@
 """Structured logging configuration using structlog."""
 
 import logging
+import re
 import sys
 from typing import Any
 
@@ -21,15 +22,30 @@ SENSITIVE_KEYS = {
     "jwt_secret_key",
 }
 
+API_KEY_PATTERNS = [
+    re.compile(r"AIzaSy[A-Za-z0-9_-]{20,}"),
+    re.compile(r"AQ\.[A-Za-z0-9_-]{20,}"),
+    re.compile(r"gsk_[A-Za-z0-9_-]{20,}"),
+]
+
+
+def scrub_sensitive_text(text: str) -> str:
+    """Scrub raw API key patterns from text strings."""
+    for pattern in API_KEY_PATTERNS:
+        text = pattern.sub("[REDACTED_SECRET]", text)
+    return text
+
 
 def censor_sensitive_dict(d: dict[str, Any]) -> dict[str, Any]:
-    """Recursively redact dictionary keys that match sensitive patterns."""
+    """Recursively redact dictionary keys and string values that match sensitive patterns."""
     clean: dict[str, Any] = {}
     for k, v in d.items():
         if any(sensitive in k.lower() for sensitive in SENSITIVE_KEYS):
             clean[k] = "[REDACTED]"
         elif isinstance(v, dict):
             clean[k] = censor_sensitive_dict(v)
+        elif isinstance(v, str):
+            clean[k] = scrub_sensitive_text(v)
         else:
             clean[k] = v
     return clean
@@ -38,12 +54,14 @@ def censor_sensitive_dict(d: dict[str, Any]) -> dict[str, Any]:
 def censor_sensitive_data(
     _logger: Any, _method_name: str, event_dict: dict[str, Any]
 ) -> dict[str, Any]:
-    """Censor sensitive parameters in log payloads."""
+    """Censor sensitive parameters and raw key patterns in log payloads."""
     for key, value in list(event_dict.items()):
         if any(sensitive in key.lower() for sensitive in SENSITIVE_KEYS):
             event_dict[key] = "[REDACTED]"
         elif isinstance(value, dict):
             event_dict[key] = censor_sensitive_dict(value)
+        elif isinstance(value, str):
+            event_dict[key] = scrub_sensitive_text(value)
     return event_dict
 
 

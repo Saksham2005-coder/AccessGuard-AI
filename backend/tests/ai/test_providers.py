@@ -44,14 +44,17 @@ def test_gemini_provider_requires_api_key() -> None:
 async def test_gemini_provider_rejects_invalid_api_key() -> None:
     """Verify GeminiLLMProvider translates upstream 400/401/403 into LLMAuthenticationError."""
     provider = GeminiLLMProvider(api_key="AIzaSyFakeKeyInvalidForTesting123456789")
-    with pytest.raises(LLMAuthenticationError) as exc_info:
-        await provider.generate_structured(
-            system_prompt="Test prompt",
-            user_payload={"test": "data"},
-            output_schema=FindingAnalysis,
-        )
-    assert exc_info.value.provider == "gemini"
-    assert exc_info.value.retryable is False
+    try:
+        with pytest.raises(LLMAuthenticationError) as exc_info:
+            await provider.generate_structured(
+                system_prompt="Test prompt",
+                user_payload={"test": "data"},
+                output_schema=FindingAnalysis,
+            )
+        assert exc_info.value.provider == "gemini"
+        assert exc_info.value.retryable is False
+    finally:
+        await provider.aclose()
 
 
 @pytest.mark.asyncio
@@ -81,14 +84,17 @@ async def test_gemini_provider_live_structured_generation() -> None:
         ],
     }
 
-    result = await provider.generate_structured(
-        system_prompt=prompt,
-        user_payload=payload,
-        output_schema=FindingAnalysis,
-    )
+    try:
+        result = await provider.generate_structured(
+            system_prompt=prompt,
+            user_payload=payload,
+            output_schema=FindingAnalysis,
+        )
 
-    assert isinstance(result, FindingAnalysis)
-    assert len(result.summary) >= 10
-    assert len(result.likely_root_cause) >= 10
-    assert "1.1.1" in result.relevant_criterion_ids
-    assert evidence_chunk_id in result.evidence_chunk_ids
+        assert isinstance(result, FindingAnalysis)
+        assert len(result.summary) >= 10
+        assert len(result.likely_root_cause) >= 10
+        assert "1.1.1" in result.relevant_criterion_ids
+        assert evidence_chunk_id in result.evidence_chunk_ids
+    finally:
+        await provider.aclose()
