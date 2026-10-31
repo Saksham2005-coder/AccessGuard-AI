@@ -44,3 +44,10 @@ class FindingDetailResponse(FindingResponse):
     """Detailed finding response with associated element nodes."""
 
     nodes: list[FindingNodeResponse] = Field(default_factory=list)
+
+
+class FindingListResponse(BaseModel):
+    """Paginated collection of accessibility findings."""
+
+    items: list[FindingResponse]
+    total: int

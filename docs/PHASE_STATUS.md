@@ -103,7 +103,7 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 - [x] Commit 42: `Cover project and scan journeys in browser`
 
 ### Phase 15 — Findings, AI remediation, reports and knowledge UI
-- [ ] Commit 43: `Build findings explorer and evidence detail views`
+- [x] Commit 43: `Build findings explorer and evidence detail views`
 - [ ] Commit 44: `Add AI remediation review and report workflows`
 - [ ] Commit 45: `Verify findings approval validation and reporting journeys`
 
@@ -120,8 +120,9 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 14 complete with full frontend test suite passing (17/17 tests across projects, scans, auth, layout, and routing), clean ESLint (0 errors, 0 warnings), clean Vite and TypeScript builds, and 100% backend test suite passing (205/205 tests). Comprehensive projects and scans UI with project creation, DNS TXT verification instructions & live checking, target domain safety constraints, scan configuration, real-time telemetry inspection, and live polling.
-- Next: Phase 15 — Findings, AI remediation, reports and knowledge UI (Commit 43: `Build findings explorer and evidence detail views`).
+- Current: Phase 15 Commit 43 complete (`Build findings explorer and evidence detail views`). Backend findings API router with tenant security and multi-parameter filtering, frontend findings API client, FindingDetailDrawer modal with copyable DOM selectors, HTML snippet formatting and WCAG criteria tags, and comprehensive FindingsPage explorer table.
+- Next: Commit 44 (`Add AI remediation review and report workflows`).
+
 
 
 
