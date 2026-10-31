@@ -13,7 +13,7 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 | **3** | PostgreSQL, SQLAlchemy, Alembic and authentication | Completed | cde91e7, f83f029 | User & RefreshSession models, Alembic migrations, Argon2 hashing, JWT & session rotation |
 | **4** | Projects, domain ownership and project authorization | Completed | d771e3e, f1dcf8e | Projects, DNS TXT verification, tenant isolation |
 | **5** | Scanner target policy and crawler foundation | Completed | 3d0babe, 40783a5 | SSRF guards, Playwright crawler, boundary tests |
-| **6** | axe-core integration and finding persistence | Pending | - | Local axe bundle injection, finding models, deduplication |
+| **6** | axe-core integration and finding persistence | Completed | 612f348, c67abb7 | Local axe bundle injection, finding models, deduplication |
 | **7** | Celery background scans, progress events and cancellation | Pending | - | Celery + Redis orchestration, SSE event streams |
 | **8** | WCAG source ingestion and local embedding pipeline | Pending | - | W3C ingestion, MiniLM embeddings, Qdrant indexing |
 | **9** | Hybrid retrieval, citations and baseline RAG evaluation | Pending | - | Dense + Lexical RRF, citation validator, benchmarks |
@@ -53,12 +53,12 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ### Phase 5 — Scanner target policy and crawler foundation
 - [x] Commit 13 (3d0babe): `Implement URL normalization and scanner target policy`
 - [x] Commit 14 (40783a5): `Add bounded Playwright browser crawler`
-- [x] Commit 15: `Cover SSRF prevention redirect validation and crawl limits`
+- [x] Commit 15 (82f725b): `Cover SSRF prevention redirect validation and crawl limits`
 
 ### Phase 6 — axe-core integration and finding persistence
-- [ ] Commit 16: `scanner: bundle axe-core and execute accessibility rules`
-- [ ] Commit 17: `database: persist normalized scan pages and findings`
-- [ ] Commit 18: `tests: verify axe results against deterministic website fixtures`
+- [x] Commit 16 (612f348): `Bundle axe-core and execute accessibility rules`
+- [x] Commit 17 (c67abb7): `Persist normalized scan pages and accessibility findings`
+- [x] Commit 18: `Verify axe-core results against deterministic website fixtures`
 
 ### Phase 7 — Celery background scans, progress events and cancellation
 - [ ] Commit 19: `workers: add Celery scan orchestration`
@@ -120,5 +120,5 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 5 complete with 111/111 passing tests, SSRF guards, Playwright Chromium crawler, and network threat model documentation.
-- Next: Phase 6 — axe-core injection, finding normalization, deduplication, and persistence schema.
+- Current: Phase 6 complete with 119/119 passing tests, local pinned axe-core execution, WCAG finding extraction, and database persistence.
+- Next: Phase 7 — Celery background scans, progress events, and SSE real-time streaming.
