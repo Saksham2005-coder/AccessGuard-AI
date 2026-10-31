@@ -17,9 +17,9 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 | **7** | Celery background scans, progress events and cancellation | Completed | e74675c, e290c31, 89804a6 | Celery + Redis orchestration, stage pipeline, SSE event streams |
 | **8** | WCAG source ingestion and local embedding pipeline | Completed | 5a3a65f, 9a30f0d, f45c221 | W3C ingestion, MiniLM embeddings, Qdrant indexing |
 | **9** | Hybrid retrieval, citations and baseline RAG evaluation | Completed | c9dd114, 4d5abd8, 70d1da2 | Dense + Lexical RRF, citation validator, 52-case empirical benchmark |
-| **10** | Live LLM provider integration *(API Key Checkpoint)* | In Progress | pending | Gemini/Groq adapters, structured outputs, prompt templates |
-| **11** | LangGraph analysis and remediation proposal workflow | Pending | - | Multi-agent state graph, RAG evidence grounding |
-| **12** | Human approval, safe patch policy and snapshot validation | Pending | - | Sandboxed DOM patch validation, axe-core verification |
+| **10** | Live LLM provider integration *(API Key Checkpoint)* | Completed | 82c2c8d, 8e8d0d8, 9b45f74 | Gemini/Groq adapters, structured outputs, prompt templates |
+| **11** | LangGraph analysis and remediation proposal workflow | Completed | 369c453, 00e0979, adc8659 | Multi-agent state graph, RAG evidence grounding |
+| **12** | Human approval, safe patch policy and snapshot validation | Completed | cd62e91, 613a195, 42ab47f | Sandboxed DOM patch validation, axe-core verification |
 | **13** | Frontend shell, authentication and design system | Pending | - | App layout, design tokens, protected routes |
 | **14** | Projects, domain verification and scan management UI | Pending | - | Verification screens, real-time scan progress SSE |
 | **15** | Findings, AI remediation, reports and knowledge UI | Pending | - | Findings explorer, remediation review, PDF/JSON export |
@@ -89,8 +89,8 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 
 ### Phase 12 — Human approval, safe patch policy and snapshot validation
 - [x] Commit 34 (cd62e91): `Add human approval and graph checkpoint persistence`
-- [x] Commit 35: `Constrain patch operations and validate isolated snapshots`
-- [ ] Commit 36: `Verify approval resume and remediation regression handling`
+- [x] Commit 35 (613a195): `Constrain patch operations and validate isolated snapshots`
+- [x] Commit 36 (42ab47f): `Verify approval resume and remediation regression handling`
 
 ### Phase 13 — Frontend shell, authentication and design system
 - [ ] Commit 37: `Establish AccessGuard design system and application shell`
