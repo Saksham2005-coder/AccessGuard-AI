@@ -11,7 +11,7 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 | **1** | Repository foundation and engineering conventions | Completed | 39ebd44, dcad099 | Monorepo structure, Python 3.12 (uv), React 19 + TS, Tailwind 4, axe-core bundle |
 | **2** | Backend core, configuration and API foundation | Completed | e75e1c7, adb8470 | Pydantic Settings, request ID context, structured logging, error handling, health probes |
 | **3** | PostgreSQL, SQLAlchemy, Alembic and authentication | Completed | cde91e7, f83f029 | User & RefreshSession models, Alembic migrations, Argon2 hashing, JWT & session rotation |
-| **4** | Projects, domain ownership and project authorization | Pending | - | Projects, DNS TXT verification, tenant isolation |
+| **4** | Projects, domain ownership and project authorization | Completed | d771e3e, f1dcf8e | Projects, DNS TXT verification, tenant isolation |
 | **5** | Scanner target policy and crawler foundation | Pending | - | SSRF guards, Playwright crawler, boundary tests |
 | **6** | axe-core integration and finding persistence | Pending | - | Local axe bundle injection, finding models, deduplication |
 | **7** | Celery background scans, progress events and cancellation | Pending | - | Celery + Redis orchestration, SSE event streams |
@@ -46,9 +46,9 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 - [x] Commit 9 (7188511): `tests: verify authentication and database isolation`
 
 ### Phase 4 — Projects, domain ownership and project authorization
-- [ ] Commit 10: `projects: add project persistence and ownership rules`
-- [ ] Commit 11: `security: implement DNS domain verification workflow`
-- [ ] Commit 12: `tests: cover project isolation and domain verification`
+- [x] Commit 10 (d771e3e): `Add project management models and data persistence`
+- [x] Commit 11 (f1dcf8e): `Implement DNS domain verification service and API endpoints`
+- [x] Commit 12: `Verify project isolation and domain verification workflows`
 
 ### Phase 5 — Scanner target policy and crawler foundation
 - [ ] Commit 13: `scanner: implement URL normalization and target policy`
@@ -120,5 +120,5 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ---
 
 ## Known Issues and Next Steps
-- Current: Establishing monorepo toolchains and baseline configurations in Phase 1.
-- Next: Complete Python and TypeScript builds, tests, and formatting checks.
+- Current: Phase 4 complete with 59/59 passing tests, RFC domain normalization, tenant isolation, and DNS TXT verification.
+- Next: Phase 5 — Scanner target policy, SSRF pre-navigation guards, and bounded Playwright crawler.
