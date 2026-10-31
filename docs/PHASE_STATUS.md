@@ -98,7 +98,7 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 - [x] Commit 39: `Verify frontend auth responsive layout and accessibility baseline`
 
 ### Phase 14 — Projects, domain verification and scan management UI
-- [ ] Commit 40: `Implement project creation and domain verification screens`
+- [x] Commit 40: `Implement project creation and domain verification screens`
 - [ ] Commit 41: `Add scan creation history and real-time progress`
 - [ ] Commit 42: `Cover project and scan journeys in browser`
 
@@ -120,7 +120,8 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 13 complete with full frontend test suite passing (11/11 tests across auth, layout, and routing), clean ESLint (0 errors, 0 warnings), clean Vite and TypeScript builds, and 100% backend test suite passing (205/205 tests). Complete design system with Button, Input, Card, Badge, Dialog, Skeleton, Table, EmptyState, responsive layout shell, accessible skip links, ProtectedRoute guard, and Zod-validated authentication flows.
-- Next: Phase 14 — Projects, domain verification and scan management UI (Commit 40: `Implement project creation and domain verification screens`).
+- Current: Phase 14 Commit 40 complete (`Implement project creation and domain verification screens`). Projects API client with domain normalization and error translation, CreateProjectModal dialog with Zod validation, DomainVerificationModal with DNS TXT record copyable targets, real-time DNS TXT check triggering, challenge token renewal, and responsive project management dashboard.
+- Next: Commit 41 (`Add scan creation history and real-time progress`).
+
 
 
