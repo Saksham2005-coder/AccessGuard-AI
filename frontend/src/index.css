@@ -1,21 +1,21 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-graphite-app: #111315;
-  --color-graphite-sidebar: #171A1F;
-  --color-graphite-card: #1D2229;
-  --color-graphite-elevated: #252C35;
-  --color-graphite-input: #171C23;
-  --color-graphite-border: #303741;
-  --color-electric-blue: #38BDF8;
-  --color-electric-hover: #0EA5E9;
-  --color-text-primary: #F3F4F6;
-  --color-text-secondary: #9CA3AF;
-  --color-text-muted: #6B7280;
-  --color-status-success: #34D399;
-  --color-status-warning: #FBBF24;
-  --color-status-critical: #FB7185;
-  --color-status-info: #60A5FA;
+  --color-graphite-app: var(--bg-app);
+  --color-graphite-sidebar: var(--bg-sidebar);
+  --color-graphite-card: var(--bg-card);
+  --color-graphite-elevated: var(--bg-elevated);
+  --color-graphite-input: var(--bg-input);
+  --color-graphite-border: var(--border-graphite);
+  --color-electric-blue: var(--electric-blue);
+  --color-electric-hover: var(--electric-hover);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-status-success: #10B981;
+  --color-status-warning: #F59E0B;
+  --color-status-critical: #EF4444;
+  --color-status-info: #3B82F6;
 }
 
 :root {
@@ -30,18 +30,29 @@
   --text-primary: #F3F4F6;
   --text-secondary: #9CA3AF;
   --text-muted: #6B7280;
-  --status-success: #34D399;
-  --status-warning: #FBBF24;
-  --status-critical: #FB7185;
-  --status-info: #60A5FA;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color-scheme: dark;
 }
 
+[data-theme="light"], .light {
+  --bg-app: #F8FAFC;
+  --bg-sidebar: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-elevated: #F1F5F9;
+  --bg-input: #FFFFFF;
+  --border-graphite: #E2E8F0;
+  --electric-blue: #0284C7;
+  --electric-hover: #0369A1;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  color-scheme: light;
+}
+
 body {
   margin: 0;
-  background-color: #111315;
-  color: #F3F4F6;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -53,24 +64,82 @@ body {
 
 ::selection {
   background-color: rgba(56, 189, 248, 0.25);
-  color: #F3F4F6;
+  color: var(--text-primary);
 }
 
-/* Custom Sleek Dark Scrollbar */
+/* Custom Sleek Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #111315;
+  background: var(--bg-app);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #303741;
+  background: var(--border-graphite);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #4B5563;
+  background: var(--text-muted);
+}
+
+/* Light Theme Overrides for Components using specific arbitrary hex colors */
+[data-theme="light"] .bg-\[\#111315\],
+[data-theme="light"] [class*="bg-[#111315]"] {
+  background-color: var(--bg-app) !important;
+}
+
+[data-theme="light"] .bg-\[\#171A1F\],
+[data-theme="light"] [class*="bg-[#171A1F]"] {
+  background-color: var(--bg-sidebar) !important;
+}
+
+[data-theme="light"] .bg-\[\#1D2229\],
+[data-theme="light"] [class*="bg-[#1D2229]"] {
+  background-color: var(--bg-card) !important;
+}
+
+[data-theme="light"] .bg-\[\#252C35\],
+[data-theme="light"] [class*="bg-[#252C35]"] {
+  background-color: var(--bg-elevated) !important;
+}
+
+[data-theme="light"] .bg-\[\#171C23\],
+[data-theme="light"] [class*="bg-[#171C23]"] {
+  background-color: var(--bg-input) !important;
+}
+
+[data-theme="light"] .border-\[\#303741\],
+[data-theme="light"] [class*="border-[#303741]"] {
+  border-color: var(--border-graphite) !important;
+}
+
+[data-theme="light"] .text-\[\#F3F4F6\],
+[data-theme="light"] [class*="text-[#F3F4F6]"] {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .text-\[\#9CA3AF\],
+[data-theme="light"] [class*="text-[#9CA3AF]"] {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="light"] .text-\[\#6B7280\],
+[data-theme="light"] [class*="text-[#6B7280]"] {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="light"] .text-white {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .text-gray-100 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .text-gray-300 {
+  color: var(--text-secondary) !important;
 }

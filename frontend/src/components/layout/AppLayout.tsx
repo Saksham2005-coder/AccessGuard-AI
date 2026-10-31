@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   Activity,
@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useAuthStore } from "../../store/authStore";
+import { ThemeToggle } from "../ui/ThemeToggle";
 
 export interface NavItem {
   title: string;
@@ -77,15 +78,18 @@ export function AppLayout({ user: userProp, onLogout: onLogoutProp }: AppLayoutP
             AccessGuard AI
           </span>
         </div>
-        <button
-          type="button"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-1.5 rounded-lg text-[#9CA3AF] hover:text-[#F3F4F6] hover:bg-[#252C35] focus:outline-none focus:ring-2 focus:ring-[#38BDF8]"
-          aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-          aria-expanded={mobileMenuOpen}
-        >
-          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-1.5 rounded-lg text-[#9CA3AF] hover:text-[#F3F4F6] hover:bg-[#252C35] focus:outline-none focus:ring-2 focus:ring-[#38BDF8]"
+            aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </header>
 
       {/* Desktop Graphite Left Sidebar */}
@@ -261,12 +265,25 @@ export function AppLayout({ user: userProp, onLogout: onLogoutProp }: AppLayoutP
               <Radio className="h-3.5 w-3.5 text-[#38BDF8]" />
               <span>Real-Time SSE</span>
             </div>
+            <div className="h-4 w-[1px] bg-[#303741]" />
+            <ThemeToggle />
           </div>
         </header>
 
         {/* Main Workspace */}
         <main id="main-content" className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full">
-          <Outlet />
+          <Suspense
+            fallback={
+              <div className="flex min-h-[50vh] w-full items-center justify-center p-8">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#38BDF8] border-t-transparent" />
+                  <span className="text-xs text-[#9CA3AF]">Loading module...</span>
+                </div>
+              </div>
+            }
+          >
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

@@ -62,3 +62,18 @@ export async function getMeApi(): Promise<User> {
   const response = await apiClient.get<User>("/auth/me");
   return response.data;
 }
+
+export async function updateProfileApi(data: { display_name: string }): Promise<User> {
+  const response = await apiClient.patch<User>("/auth/me", data);
+  return response.data;
+}
+
+export async function changePasswordApi(data: {
+  current_password: string;
+  new_password: string;
+  confirm_password: string;
+}): Promise<MessageResponse> {
+  const response = await apiClient.post<MessageResponse>("/auth/change-password", data);
+  return response.data;
+}
+

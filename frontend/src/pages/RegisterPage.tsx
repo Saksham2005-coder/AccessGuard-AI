@@ -147,12 +147,16 @@ export function RegisterPage() {
                       errors.email ? "border-[#FB7185]" : "border-[#303741]"
                     }`}
                     aria-invalid={Boolean(errors.email)}
-                    aria-describedby={errors.email ? "email-error" : undefined}
+                    aria-describedby={errors.email ? "email-error" : "email-hint"}
                   />
                 </div>
-                {errors.email && (
+                {errors.email ? (
                   <p id="email-error" className="mt-1 text-xs text-[#FB7185]" role="alert">
                     {errors.email.message}
+                  </p>
+                ) : (
+                  <p id="email-hint" className="mt-1 text-[11px] text-[#9CA3AF]">
+                    Standard email format with a valid top-level domain (e.g., name@example.com).
                   </p>
                 )}
               </div>
@@ -176,12 +180,16 @@ export function RegisterPage() {
                       errors.password ? "border-[#FB7185]" : "border-[#303741]"
                     }`}
                     aria-invalid={Boolean(errors.password)}
-                    aria-describedby={errors.password ? "password-error" : undefined}
+                    aria-describedby={errors.password ? "password-error" : "password-hint"}
                   />
                 </div>
-                {errors.password && (
+                {errors.password ? (
                   <p id="password-error" className="mt-1 text-xs text-[#FB7185]" role="alert">
                     {errors.password.message}
+                  </p>
+                ) : (
+                  <p id="password-hint" className="mt-1 text-[11px] text-[#9CA3AF]">
+                    Must be at least 8 characters. Hashed via high-workload Argon2id.
                   </p>
                 )}
               </div>

@@ -40,6 +40,8 @@ export function ReportsPage() {
 
   const scans = scansData?.items || [];
   const findings = findingsData?.items || [];
+  const completedScans = scans.filter((s) => s.status === "completed");
+  const hasCompletedScans = completedScans.length > 0;
 
   const totalViolations = findings.length;
   const criticalCount = findings.filter((f) => f.impact === "critical").length;
@@ -49,7 +51,7 @@ export function ReportsPage() {
 
   // Simple automated health score (100 - weighted violations, bounded 0-100)
   const penalty = criticalCount * 15 + seriousCount * 8 + moderateCount * 3 + minorCount * 1;
-  const healthScore = Math.max(0, 100 - penalty);
+  const healthScore = hasCompletedScans ? Math.max(0, 100 - penalty) : null;
 
   const handleDownloadJson = () => {
     const reportData = {
@@ -58,8 +60,10 @@ export function ReportsPage() {
       standards: "WCAG 2.1 / 2.2 Level A/AA",
       audit_engine: "axe-core 4.14.0 with Playwright Chromium",
       health_score: healthScore,
+      health_score_status: hasCompletedScans ? "assessed" : "not_yet_assessed",
       summary: {
         total_scans: scans.length,
+        completed_scans: completedScans.length,
         total_findings: totalViolations,
         critical: criticalCount,
         serious: seriousCount,
@@ -77,6 +81,46 @@ export function ReportsPage() {
     const a = document.createElement("a");
     a.href = url;
     a.download = `accessguard-audit-${activeProject?.base_domain || "report"}-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const sanitizeCsvField = (value: string | number | null | undefined): string => {
+    if (value === null || value === undefined) return '""';
+    let str = String(value);
+    // Neutralize formula injection in spreadsheet software
+    if (/^[=+\-@\t\r]/.test(str)) {
+      str = `'${str}`;
+    }
+    str = str.replace(/"/g, '""');
+    return `"${str}"`;
+  };
+
+  const handleDownloadCsv = () => {
+    const headers = [
+      "Rule ID",
+      "Impact",
+      "Description",
+      "Help",
+      "Help URL",
+      "Target / Selector",
+      "Scan Page ID",
+    ];
+    const rows = findings.map((f) => [
+      sanitizeCsvField(f.axe_rule_id),
+      sanitizeCsvField(f.impact),
+      sanitizeCsvField(f.description),
+      sanitizeCsvField(f.help),
+      sanitizeCsvField(f.help_url),
+      sanitizeCsvField(f.selector),
+      sanitizeCsvField(f.scan_page_id),
+    ]);
+    const csvContent = [headers.map(sanitizeCsvField).join(","), ...rows.map((r) => r.join(","))].join("\r\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `accessguard-audit-${activeProject?.base_domain || "report"}-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -134,6 +178,11 @@ export function ReportsPage() {
             ))}
           </select>
 
+          <Button variant="outline" size="sm" onClick={handleDownloadCsv} className="gap-1.5 text-xs">
+            <Download className="h-3.5 w-3.5 text-emerald-400" />
+            <span>Download CSV</span>
+          </Button>
+
           <Button variant="outline" size="sm" onClick={handleDownloadJson} className="gap-1.5 text-xs">
             <Download className="h-3.5 w-3.5 text-[#38BDF8]" />
             <span>Download JSON</span>
@@ -170,10 +219,12 @@ export function ReportsPage() {
             <div className="flex items-center gap-4 bg-[#111315] border border-[#303741] rounded-2xl p-4 shrink-0">
               <div className="text-right">
                 <div className="text-xs text-[#9CA3AF] font-medium">Health Score</div>
-                <div className="text-xs text-[#6B7280]">Out of 100 max</div>
+                <div className="text-xs text-[#6B7280]">
+                  {hasCompletedScans ? "Out of 100 max" : "Not yet assessed"}
+                </div>
               </div>
               <div className="text-3xl font-extrabold font-mono text-[#38BDF8]">
-                {healthScore}
+                {hasCompletedScans ? healthScore : "N/A"}
               </div>
             </div>
           </div>

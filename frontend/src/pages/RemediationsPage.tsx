@@ -160,9 +160,10 @@ export function RemediationsPage() {
             aria-label="Filter remediations by status"
           >
             <option value="" className="bg-[#1D2229]">All Proposals</option>
-            <option value="pending_approval" className="bg-[#1D2229]">Pending Review</option>
+            <option value="proposed" className="bg-[#1D2229]">Proposed (Pending Review)</option>
             <option value="approved" className="bg-[#1D2229]">Approved</option>
             <option value="validated" className="bg-[#1D2229]">Snapshot Validated</option>
+            <option value="validation_failed" className="bg-[#1D2229]">Validation Failed</option>
             <option value="rejected" className="bg-[#1D2229]">Rejected</option>
           </select>
         </div>
