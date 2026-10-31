@@ -45,8 +45,31 @@ apiClient.interceptors.request.use(
 );
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const contentType = String(response.headers?.["content-type"] || "");
+    if (
+      typeof response.data === "string" &&
+      (response.data.trim().startsWith("<!DOCTYPE html") ||
+        response.data.trim().startsWith("<html") ||
+        contentType.includes("text/html"))
+    ) {
+      throw new Error(
+        "API service returned HTML fallback instead of JSON. Ensure the backend is running and the API proxy is configured."
+      );
+    }
+    return response;
+  },
   async (error: AxiosError) => {
+    if (
+      error.response &&
+      typeof error.response.data === "string" &&
+      (error.response.data.trim().startsWith("<!DOCTYPE html") ||
+        error.response.data.trim().startsWith("<html"))
+    ) {
+      error.message =
+        "API service unreachable or route not found via dev proxy (HTML response received).";
+    }
+
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
     };

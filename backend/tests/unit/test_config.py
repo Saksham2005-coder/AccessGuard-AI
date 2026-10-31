@@ -67,3 +67,53 @@ def test_production_security_validation() -> None:
     )
     # Should not raise
     valid_prod.validate_runtime_security()
+
+
+def test_production_rejects_default_jwt_secret() -> None:
+    """Verify production rejects placeholder JWT secrets."""
+    settings = Settings(
+        APP_ENV="production",
+        DATABASE_URL="postgresql+psycopg://user:real_pass@db:5432/prod",
+        JWT_SECRET_KEY="local-dev-secret-key-that-is-long-enough",
+        COOKIE_SECURE=True,
+    )
+    with pytest.raises(ValueError, match="Default JWT_SECRET_KEY"):
+        settings.validate_runtime_security()
+
+
+def test_production_rejects_insecure_cookie() -> None:
+    """Verify production rejects COOKIE_SECURE=False."""
+    settings = Settings(
+        APP_ENV="production",
+        DATABASE_URL="postgresql+psycopg://user:real_pass@db:5432/prod",
+        JWT_SECRET_KEY="a-secure-production-random-secret-key-here",
+        COOKIE_SECURE=False,
+    )
+    with pytest.raises(ValueError, match="COOKIE_SECURE must be True in production"):
+        settings.validate_runtime_security()
+
+
+def test_production_rejects_loopback_override() -> None:
+    """Verify production forbids TEST_ALLOW_LOOPBACK=True."""
+    settings = Settings(
+        APP_ENV="production",
+        DATABASE_URL="postgresql+psycopg://user:real_pass@db:5432/prod",
+        JWT_SECRET_KEY="a-secure-production-random-secret-key-here",
+        COOKIE_SECURE=True,
+        TEST_ALLOW_LOOPBACK=True,
+    )
+    with pytest.raises(ValueError, match="TEST_ALLOW_LOOPBACK must never be True"):
+        settings.validate_runtime_security()
+
+
+def test_development_config_permits_local_defaults() -> None:
+    """Verify development mode cleanly permits local placeholders."""
+    dev_settings = Settings(
+        APP_ENV="development",
+        DATABASE_URL="postgresql+psycopg://accessguard:change-me@localhost:5432/accessguard",
+        JWT_SECRET_KEY="local-dev-secret-key-change-in-production-min-32-chars",
+        COOKIE_SECURE=False,
+        TEST_ALLOW_LOOPBACK=False,
+    )
+    # Must not raise in development
+    dev_settings.validate_runtime_security()

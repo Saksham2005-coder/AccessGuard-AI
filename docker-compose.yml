@@ -60,11 +60,11 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://accessguard:change-me@postgres:5432/accessguard}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://${POSTGRES_USER:-accessguard}:${POSTGRES_PASSWORD:-change-me}@postgres:5432/${POSTGRES_DB:-accessguard}}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
       QDRANT_URL: ${QDRANT_URL:-http://qdrant:6333}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-local-dev-jwt-secret-key-min-32-chars-long-12345}
-      APP_ENV: ${APP_ENV:-production}
+      APP_ENV: ${APP_ENV:-development}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:80}
       LLM_PROVIDER: ${LLM_PROVIDER:-mock}
@@ -92,13 +92,13 @@ services:
       dockerfile: backend/Dockerfile
     container_name: accessguard-worker
     restart: unless-stopped
-    command: ["uv", "run", "celery", "-A", "app.core.celery_app.celery_app", "worker", "--loglevel=info", "--concurrency=2"]
+    command: ["uv", "run", "celery", "-A", "app.workers.celery_app:celery_app", "worker", "--loglevel=info", "--concurrency=2"]
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://accessguard:change-me@postgres:5432/accessguard}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://${POSTGRES_USER:-accessguard}:${POSTGRES_PASSWORD:-change-me}@postgres:5432/${POSTGRES_DB:-accessguard}}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
       QDRANT_URL: ${QDRANT_URL:-http://qdrant:6333}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-local-dev-jwt-secret-key-min-32-chars-long-12345}
-      APP_ENV: ${APP_ENV:-production}
+      APP_ENV: ${APP_ENV:-development}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       LLM_PROVIDER: ${LLM_PROVIDER:-mock}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
