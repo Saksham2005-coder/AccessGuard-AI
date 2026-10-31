@@ -17,7 +17,7 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 | **7** | Celery background scans, progress events and cancellation | Completed | e74675c, e290c31, 89804a6 | Celery + Redis orchestration, stage pipeline, SSE event streams |
 | **8** | WCAG source ingestion and local embedding pipeline | Completed | 5a3a65f, 9a30f0d, f45c221 | W3C ingestion, MiniLM embeddings, Qdrant indexing |
 | **9** | Hybrid retrieval, citations and baseline RAG evaluation | Completed | c9dd114, 4d5abd8, 70d1da2 | Dense + Lexical RRF, citation validator, 52-case empirical benchmark |
-| **10** | Live LLM provider integration *(API Key Checkpoint)* | Pending | - | Gemini/Groq adapters, structured outputs, prompt templates |
+| **10** | Live LLM provider integration *(API Key Checkpoint)* | In Progress | pending | Gemini/Groq adapters, structured outputs, prompt templates |
 | **11** | LangGraph analysis and remediation proposal workflow | Pending | - | Multi-agent state graph, RAG evidence grounding |
 | **12** | Human approval, safe patch policy and snapshot validation | Pending | - | Sandboxed DOM patch validation, axe-core verification |
 | **13** | Frontend shell, authentication and design system | Pending | - | App layout, design tokens, protected routes |
@@ -78,7 +78,7 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 *(Phase 9 Checkpoint: Await User Configuration of GEMINI_API_KEY or GROQ_API_KEY before Phase 10)*
 
 ### Phase 10 — Live LLM provider integration
-- [ ] Commit 28: `Define provider abstraction and deterministic mock model`
+- [x] Commit 28: `Define provider abstraction and deterministic mock model`
 - [ ] Commit 29: `Integrate configured Gemini and Groq adapters`
 - [ ] Commit 30: `Validate structured outputs retries and secret handling`
 
