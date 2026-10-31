@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 
 from app.api.deps import CurrentUserDep, DbDep
-from app.core.errors import NotFoundError
+from app.core.errors import AuthorizationError
 from app.core.logging import get_logger
 from app.db.models.scan import Scan
 from app.schemas.auth import MessageResponse
@@ -46,7 +46,7 @@ async def create_scan(
     # Verify project domain has been verified
     is_verified, _ = await get_project_verification_status(db, project.id)
     if not is_verified:
-        raise NotFoundError(
+        raise AuthorizationError(
             f"Domain '{project.base_domain}' is not verified. "
             "Please complete DNS TXT verification before running a scan."
         )

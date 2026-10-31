@@ -8,12 +8,14 @@ from app.api.deps import CurrentUserDep, DbDep, SettingsDep
 from app.core.errors import AuthenticationError
 from app.db.models.user import User
 from app.schemas.auth import (
+    ChangePasswordRequest,
     MessageResponse,
     RefreshTokenRequest,
     TokenResponse,
     UserLoginRequest,
     UserRegisterRequest,
     UserResponse,
+    UserUpdateRequest,
 )
 from app.services import auth_service
 
@@ -145,3 +147,37 @@ async def get_me(
 ) -> User:
     """Return profile data for the authenticated session user."""
     return current_user
+
+
+@router.patch(
+    "/me",
+    response_model=UserResponse,
+    summary="Update Profile",
+)
+async def update_me(
+    body: UserUpdateRequest,
+    current_user: CurrentUserDep,
+    db: DbDep,
+) -> User:
+    """Update profile information for the authenticated user."""
+    updated_user = await auth_service.update_user_profile(db, current_user, body.display_name)
+    await db.commit()
+    return updated_user
+
+
+@router.post(
+    "/change-password",
+    response_model=MessageResponse,
+    summary="Change Account Password",
+)
+async def change_password(
+    body: ChangePasswordRequest,
+    current_user: CurrentUserDep,
+    db: DbDep,
+) -> MessageResponse:
+    """Change account password and invalidate existing refresh sessions."""
+    await auth_service.change_user_password(
+        db, current_user, body.current_password, body.new_password
+    )
+    await db.commit()
+    return MessageResponse(message="Password successfully changed.")

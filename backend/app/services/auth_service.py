@@ -135,3 +135,37 @@ async def get_user_by_id(db: AsyncSession, user_id: uuid.UUID) -> User | None:
     """Lookup user by primary key UUID."""
     result = await db.execute(select(User).where(User.id == user_id))
     return result.scalar_one_or_none()
+
+
+async def update_user_profile(db: AsyncSession, user: User, display_name: str | None) -> User:
+    """Update profile attributes for authenticated user."""
+    clean_name = display_name.strip() if display_name else None
+    user.display_name = clean_name
+    await db.flush()
+    await db.refresh(user)
+    logger.info("Updated user profile", user_id=str(user.id), display_name=clean_name)
+    return user
+
+
+async def change_user_password(
+    db: AsyncSession, user: User, current_password: str, new_password: str
+) -> None:
+    """Validate current password and update to new Argon2id hash, revoking other sessions."""
+    if not verify_password(current_password, user.password_hash):
+        logger.info("Password change failed: incorrect current password", user_id=str(user.id))
+        raise AuthenticationError("Current password is incorrect.")
+
+    user.password_hash = get_password_hash(new_password)
+
+    # Revoke all active refresh sessions for this user for security
+    sessions_result = await db.execute(
+        select(RefreshSession).where(
+            RefreshSession.user_id == user.id,
+            RefreshSession.is_revoked.is_(False),
+        )
+    )
+    for session in sessions_result.scalars().all():
+        session.is_revoked = True
+
+    await db.flush()
+    logger.info("Password changed and active sessions revoked", user_id=str(user.id))

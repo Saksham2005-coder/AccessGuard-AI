@@ -64,6 +64,28 @@ class RefreshTokenRequest(BaseModel):
     refresh_token: str | None = None
 
 
+class UserUpdateRequest(BaseModel):
+    """Payload for updating user profile."""
+
+    display_name: str | None = Field(default=None, max_length=120, description="Display name")
+
+
+class ChangePasswordRequest(BaseModel):
+    """Payload for changing account password."""
+
+    current_password: str = Field(..., description="Current account password")
+    new_password: str = Field(..., min_length=8, max_length=128, description="New password")
+    confirm_password: str = Field(..., description="Confirmation of new password")
+
+    @field_validator("confirm_password")
+    @classmethod
+    def passwords_match(cls, v: str, info: object) -> str:
+        """Ensure new password and confirmation match."""
+        if hasattr(info, "data") and "new_password" in info.data and v != info.data["new_password"]:
+            raise ValueError("New password and confirmation password do not match.")
+        return v
+
+
 class MessageResponse(BaseModel):
     """Generic confirmation response."""
 
