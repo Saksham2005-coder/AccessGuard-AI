@@ -97,10 +97,10 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 - [x] Commit 38 (c8acef4): `Implement authentication and protected navigation`
 - [x] Commit 39: `Verify frontend auth responsive layout and accessibility baseline`
 
-### Phase 14 — Projects, domain verification and scan management UI
+### Phase 14 — Projects, domain verification and scan management UI (COMPLETED)
 - [x] Commit 40 (f14cc2a): `Implement project creation and domain verification screens`
-- [x] Commit 41: `Add scan creation history and real-time progress`
-- [ ] Commit 42: `Cover project and scan journeys in browser`
+- [x] Commit 41 (e992f13): `Add scan creation history and real-time progress`
+- [x] Commit 42: `Cover project and scan journeys in browser`
 
 ### Phase 15 — Findings, AI remediation, reports and knowledge UI
 - [ ] Commit 43: `Build findings explorer and evidence detail views`
@@ -120,8 +120,9 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 14 Commit 41 complete (`Add scan creation history and real-time progress`). Scans API layer with typed models, CreateScanModal with project selection, target URL normalization, crawl depth/pages limits and domain verification guard, ScanDetailModal with live progress telemetry, pages/violations metrics and cancellation capability, and responsive ScansPage with live polling.
-- Next: Commit 42 (`Cover project and scan journeys in browser`).
+- Current: Phase 14 complete with full frontend test suite passing (17/17 tests across projects, scans, auth, layout, and routing), clean ESLint (0 errors, 0 warnings), clean Vite and TypeScript builds, and 100% backend test suite passing (205/205 tests). Comprehensive projects and scans UI with project creation, DNS TXT verification instructions & live checking, target domain safety constraints, scan configuration, real-time telemetry inspection, and live polling.
+- Next: Phase 15 — Findings, AI remediation, reports and knowledge UI (Commit 43: `Build findings explorer and evidence detail views`).
+
 
 
 
