@@ -107,10 +107,10 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 - [x] Commit 44: `Add AI remediation review and report workflows`
 - [x] Commit 45: `Verify findings approval validation and reporting journeys`
 
-### Phase 16 — Docker hardening, CI/CD and deployment readiness
+### Phase 16 — Docker hardening, CI/CD and deployment readiness (COMPLETED)
 - [x] Commit 46: `Containerize frontend backend worker and data services`
 - [x] Commit 47: `Automate backend frontend scanner and container checks`
-- [ ] Commit 48: `Harden runtime configuration and deployment boundaries`
+- [x] Commit 48: `Harden runtime configuration and deployment boundaries`
 
 ### Phase 17 — Full regression, documentation, release and final handoff
 - [ ] Commit 49: `Complete full system regression and security verification`
@@ -120,8 +120,8 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 16 Commit 47 complete (`Automate backend frontend scanner and container checks`). Built GitHub Actions continuous integration workflow (`.github/workflows/ci.yml`) covering backend linting/formatting (ruff), pytest test suites, frontend linting/Vitest tests/production bundling, and Docker container build validation. Added live LLM provider smoke test workflow (`.github/workflows/live-smoke.yml`). Ensured 100% clean formatting across all 124 backend files.
-- Next: Phase 16 Commit 48 (`Harden runtime configuration and deployment boundaries`).
+- Current: Phase 16 completed (`Docker hardening, CI/CD and deployment readiness`). Established non-root multi-stage containers for backend/worker and static frontend Nginx, verified docker compose configuration across 6 services, built GitHub Actions continuous integration, automated formatting across all 124 backend files, hardened `.env.example`, and authored comprehensive operational boundaries in `infrastructure/deployment/DEPLOYMENT_GUIDE.md`.
+- Next: Phase 17 Commit 49 (`Complete full system regression and security verification`).
 
 
 
