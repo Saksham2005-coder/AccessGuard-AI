@@ -201,9 +201,15 @@ async def validate_target_url(
         )
 
     # Port validation
-    permitted_ports = allowed_ports if allowed_ports is not None else STANDARD_PORTS
+    if allowed_ports is not None:
+        permitted_ports = allowed_ports
+    elif allow_loopback:
+        permitted_ports = None  # Loopback test fixtures use ephemeral ports
+    else:
+        permitted_ports = STANDARD_PORTS
+
     port = parsed.port or (443 if parsed.scheme == "https" else 80)
-    if port not in permitted_ports:
+    if permitted_ports is not None and port not in permitted_ports:
         raise PolicyViolationError(
             f"Port {port} is not permitted for scanning. Allowed ports: {sorted(permitted_ports)}",
             code="PORT_NOT_ALLOWED",
