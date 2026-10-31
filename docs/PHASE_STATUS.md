@@ -113,15 +113,15 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 - [x] Commit 48: `Harden runtime configuration and deployment boundaries`
 
 ### Phase 17 — Full regression, documentation, release and final handoff
-- [ ] Commit 49: `Complete full system regression and security verification`
+- [x] Commit 49: `Complete full system regression and security verification`
 - [ ] Commit 50: `Finalize setup architecture evaluation and operations guides`
 - [ ] Commit 51: `Prepare AccessGuard AI first deployable version`
 
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 16 completed (`Docker hardening, CI/CD and deployment readiness`). Established non-root multi-stage containers for backend/worker and static frontend Nginx, verified docker compose configuration across 6 services, built GitHub Actions continuous integration, automated formatting across all 124 backend files, hardened `.env.example`, and authored comprehensive operational boundaries in `infrastructure/deployment/DEPLOYMENT_GUIDE.md`.
-- Next: Phase 17 Commit 49 (`Complete full system regression and security verification`).
+- Current: Phase 17 Commit 49 complete (`Complete full system regression and security verification`). Implemented and verified end-to-end full system regression test (`backend/tests/e2e/test_system_regression.py`) covering the complete user lifecycle from authentication, project creation, DNS TXT verification, scan findings persistence, AI remediation proposals, human review approval, to isolated snapshot validation. Added system security verification (`backend/tests/security/test_system_security.py`) validating IDOR tenant boundaries, SSRF target policies (loopback, private CIDRs, cloud IMDS), and safe DOM patch policy attribute and script scheme rejection. All 34 tests passing cleanly.
+- Next: Phase 17 Commit 50 (`Finalize setup architecture evaluation and operations guides`).
 
 
 
