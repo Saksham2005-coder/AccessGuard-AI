@@ -102,10 +102,10 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 - [x] Commit 41 (e992f13): `Add scan creation history and real-time progress`
 - [x] Commit 42: `Cover project and scan journeys in browser`
 
-### Phase 15 — Findings, AI remediation, reports and knowledge UI
+### Phase 15 — Findings, AI remediation, reports and knowledge UI (COMPLETED)
 - [x] Commit 43: `Build findings explorer and evidence detail views`
 - [x] Commit 44: `Add AI remediation review and report workflows`
-- [ ] Commit 45: `Verify findings approval validation and reporting journeys`
+- [x] Commit 45: `Verify findings approval validation and reporting journeys`
 
 ### Phase 16 — Docker hardening, CI/CD and deployment readiness
 - [ ] Commit 46: `Containerize frontend backend worker and data services`
@@ -120,8 +120,8 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 15 Commit 44 complete (`Add AI remediation review and report workflows`). Implemented backend remediation listing API with tenant security, frontend remediations API client, RemediationsPage with before/after DOM patch comparison diff viewer, human approval modal with reviewer notes, rejection explanation modal, snapshot validation trigger, and comprehensive ReportsPage with compliance health score calculation, WCAG principle evaluation breakdown, structured JSON dataset download, and printable audit report.
-- Next: Commit 45 (`Verify findings approval validation and reporting journeys`).
+- Current: Phase 15 completed (`Findings, AI remediation, reports and knowledge UI`). All 23 vitest unit and journey tests passing, Vite production build passing with 0 errors, ESLint passing with 0 errors and 0 warnings, and 205 backend tests passing.
+- Next: Phase 16 Commit 46 (`Containerize frontend backend worker and data services`).
 
 
 
