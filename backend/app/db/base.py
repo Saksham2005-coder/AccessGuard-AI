@@ -22,6 +22,13 @@ def utc_now() -> datetime:
     return datetime.now(UTC)
 
 
+def ensure_utc(dt: datetime) -> datetime:
+    """Ensure a datetime instance is timezone-aware in UTC."""
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=UTC)
+    return dt.astimezone(UTC)
+
+
 class Base(DeclarativeBase):
     """Base declarative class for all AccessGuard SQLAlchemy models."""
 
