@@ -30,6 +30,7 @@ dependencies = [
     "orjson>=3.10.7",
     "langchain-google-genai>=2.0.1",
     "langchain-groq>=0.2.0",
+    "beautifulsoup4>=4.15.0",
 ]
 
 [dependency-groups]
