@@ -9,7 +9,7 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 | Phase | Title | Status | Commits | Notes |
 |:---:|---|:---:|---|---|
 | **1** | Repository foundation and engineering conventions | Completed | 39ebd44, dcad099 | Monorepo structure, Python 3.12 (uv), React 19 + TS, Tailwind 4, axe-core bundle |
-| **2** | Backend core, configuration and API foundation | Pending | - | FastAPI app, settings, health checks, middleware |
+| **2** | Backend core, configuration and API foundation | Completed | e75e1c7, adb8470 | Pydantic Settings, request ID context, structured logging, error handling, health probes |
 | **3** | PostgreSQL, SQLAlchemy, Alembic and authentication | Pending | - | Models, async sessions, Argon2, JWT auth |
 | **4** | Projects, domain ownership and project authorization | Pending | - | Projects, DNS TXT verification, tenant isolation |
 | **5** | Scanner target policy and crawler foundation | Pending | - | SSRF guards, Playwright crawler, boundary tests |
@@ -36,9 +36,9 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 - [x] Commit 3 (4bdd474): `docs: record initial architecture and development rules`
 
 ### Phase 2 — Backend core, configuration and API foundation
-- [ ] Commit 4: `api: establish FastAPI application and configuration`
-- [ ] Commit 5: `api: add health checks middleware and error handling`
-- [ ] Commit 6: `tests: cover API startup configuration and health routes`
+- [x] Commit 4 (e75e1c7): `api: establish FastAPI application and configuration`
+- [x] Commit 5 (adb8470): `api: add health checks middleware and error handling`
+- [x] Commit 6 (86db14c): `tests: cover API startup configuration and health routes`
 
 ### Phase 3 — PostgreSQL, SQLAlchemy, Alembic and authentication
 - [ ] Commit 7: `database: add SQLAlchemy models and migration foundation`
