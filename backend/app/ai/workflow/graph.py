@@ -8,11 +8,13 @@ from app.ai.provider import LLMProvider
 from app.ai.workflow.nodes import (
     finalize_node,
     finding_analysis_node,
+    human_approval_node,
     knowledge_retrieval_node,
     mark_manual_review_node,
     remediation_proposal_node,
     review_node,
     scan_context_node,
+    snapshot_validation_node,
 )
 from app.ai.workflow.state import AccessGuardGraphState
 
@@ -53,24 +55,23 @@ def route_after_remediation_proposal(
     return "review"
 
 
-def route_after_review(
+def route_after_human_approval(
     state: AccessGuardGraphState,
-) -> Literal["finalize", "remediation_proposal", "mark_manual_review"]:
-    """Route to finalize on approval, retry remediation once on failure, or escalate to manual review."""
-    if state.get("status") == "review_passed":
-        return "finalize"
-    # Allow at most 1 regeneration attempt (initial attempt = 1, retry = 2)
-    if state.get("attempt_count", 0) <= 1:
-        return "remediation_proposal"
-    return "mark_manual_review"
+) -> Literal["snapshot_validation", "finalize"]:
+    """Route to snapshot validation on approval, or finalize directly on rejection."""
+    if state.get("status") == "approved":
+        return "snapshot_validation"
+    return "finalize"
 
 
 def build_remediation_graph(
     *,
     provider: LLMProvider | None = None,
     retriever: Any = None,
+    validator: Any = None,
     db: Any = None,
     checkpointer: Any = None,
+    require_human_approval: bool = False,
 ) -> Any:
     """Construct and compile the typed LangGraph investigation workflow."""
     workflow = StateGraph(AccessGuardGraphState)
@@ -94,6 +95,15 @@ def build_remediation_graph(
     workflow.add_node("remediation_proposal", _remediation_step)
     workflow.add_node("review", review_node)
     workflow.add_node("mark_manual_review", mark_manual_review_node)
+
+    if require_human_approval:
+        workflow.add_node("human_approval", human_approval_node)
+
+        async def _validation_step(state: AccessGuardGraphState) -> dict[str, Any]:
+            return await snapshot_validation_node(state, validator=validator)
+
+        workflow.add_node("snapshot_validation", _validation_step)
+
     workflow.add_node("finalize", finalize_node)
 
     # 2. Add edges and conditional routing
@@ -135,15 +145,40 @@ def build_remediation_graph(
         },
     )
 
+    def route_after_review(
+        state: AccessGuardGraphState,
+    ) -> Literal["human_approval", "finalize", "remediation_proposal", "mark_manual_review"]:
+        if state.get("status") == "review_passed":
+            return "human_approval" if require_human_approval else "finalize"
+        if state.get("attempt_count", 0) <= 1:
+            return "remediation_proposal"
+        return "mark_manual_review"
+
+    review_destinations = {
+        "remediation_proposal": "remediation_proposal",
+        "mark_manual_review": "mark_manual_review",
+    }
+    if require_human_approval:
+        review_destinations["human_approval"] = "human_approval"
+    else:
+        review_destinations["finalize"] = "finalize"
+
     workflow.add_conditional_edges(
         "review",
         route_after_review,
-        {
-            "finalize": "finalize",
-            "remediation_proposal": "remediation_proposal",
-            "mark_manual_review": "mark_manual_review",
-        },
+        review_destinations,
     )
+
+    if require_human_approval:
+        workflow.add_conditional_edges(
+            "human_approval",
+            route_after_human_approval,
+            {
+                "snapshot_validation": "snapshot_validation",
+                "finalize": "finalize",
+            },
+        )
+        workflow.add_edge("snapshot_validation", "finalize")
 
     workflow.add_edge("mark_manual_review", "finalize")
     workflow.add_edge("finalize", END)

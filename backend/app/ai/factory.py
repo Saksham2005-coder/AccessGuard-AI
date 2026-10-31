@@ -11,6 +11,12 @@ logger = get_logger("ai_factory")
 _cached_provider: LLMProvider | None = None
 
 
+def set_cached_provider(provider: LLMProvider | None) -> None:
+    """Set or clear the cached LLM provider singleton (used for testing and overrides)."""
+    global _cached_provider
+    _cached_provider = provider
+
+
 def get_llm_provider(force_new: bool = False, provider_override: str | None = None) -> LLMProvider:
     """Return configured LLM provider instance based on application settings.
 

@@ -88,7 +88,7 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 - [x] Commit 33 (adc8659): `Cover routing grounding and prompt-injection scenarios`
 
 ### Phase 12 — Human approval, safe patch policy and snapshot validation
-- [ ] Commit 34: `Add human approval and graph checkpoint persistence`
+- [x] Commit 34: `Add human approval and graph checkpoint persistence`
 - [ ] Commit 35: `Constrain patch operations and validate isolated snapshots`
 - [ ] Commit 36: `Verify approval resume and remediation regression handling`
 

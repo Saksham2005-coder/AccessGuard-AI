@@ -27,6 +27,10 @@ class MockLLMProvider(LLMProvider):
     def default_model(self) -> str:
         return "deterministic-mock-v1"
 
+    @property
+    def model_name(self) -> str:
+        return self.default_model
+
     def set_simulated_error(self, error: LLMError | None) -> None:
         """Inject a simulated error to test failure handling and retries."""
         self._simulated_error = error
