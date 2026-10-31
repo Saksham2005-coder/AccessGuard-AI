@@ -79,7 +79,7 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 
 ### Phase 10 — Live LLM provider integration
 - [x] Commit 28: `Define provider abstraction and deterministic mock model`
-- [ ] Commit 29: `Integrate configured Gemini and Groq adapters`
+- [x] Commit 29: `Integrate configured Gemini and Groq adapters`
 - [ ] Commit 30: `Validate structured outputs retries and secret handling`
 
 ### Phase 11 — LangGraph analysis and remediation proposal workflow

@@ -9,6 +9,8 @@ from app.ai.exceptions import (
     LLMServerUnavailableError,
 )
 from app.ai.factory import get_llm_provider
+from app.ai.gemini_provider import GeminiLLMProvider
+from app.ai.groq_provider import GroqLLMProvider
 from app.ai.mock_provider import MockLLMProvider
 from app.ai.provider import LLMProvider
 from app.ai.schemas import (
@@ -22,6 +24,8 @@ from app.ai.schemas import (
 __all__ = [
     "SAFE_ATTRIBUTES",
     "FindingAnalysis",
+    "GeminiLLMProvider",
+    "GroqLLMProvider",
     "LLMAuthenticationError",
     "LLMContextLimitError",
     "LLMError",
