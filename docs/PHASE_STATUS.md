@@ -20,11 +20,11 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 | **10** | Live LLM provider integration *(API Key Checkpoint)* | Completed | 82c2c8d, 8e8d0d8, 9b45f74 | Gemini/Groq adapters, structured outputs, prompt templates |
 | **11** | LangGraph analysis and remediation proposal workflow | Completed | 369c453, 00e0979, adc8659 | Multi-agent state graph, RAG evidence grounding |
 | **12** | Human approval, safe patch policy and snapshot validation | Completed | cd62e91, 613a195, 42ab47f | Sandboxed DOM patch validation, axe-core verification |
-| **13** | Frontend shell, authentication and design system | Pending | - | App layout, design tokens, protected routes |
-| **14** | Projects, domain verification and scan management UI | Pending | - | Verification screens, real-time scan progress SSE |
-| **15** | Findings, AI remediation, reports and knowledge UI | Pending | - | Findings explorer, remediation review, PDF/JSON export |
-| **16** | Docker hardening, CI/CD and deployment readiness | Pending | - | Multi-stage Dockerfiles, Compose stack, GitHub Actions |
-| **17** | Full regression, documentation, release and final handoff | Pending | - | E2E suite, security validation, v1.0.0 release |
+| **13** | Frontend shell, authentication and design system | Completed | 2c9b608, c8acef4, c94e3fd | App layout, design tokens, protected routes |
+| **14** | Projects, domain verification and scan management UI | Completed | f14cc2a, e992f13, 9e2aa59 | Verification screens, real-time scan progress SSE |
+| **15** | Findings, AI remediation, reports and knowledge UI | Completed | de93b8d, 7a30fef, 1eb1216 | Findings explorer, remediation review, PDF/JSON export |
+| **16** | Docker hardening, CI/CD and deployment readiness | Completed | b112a9a, 12c5877, bdbdb8e | Multi-stage Dockerfiles, Compose stack, GitHub Actions |
+| **17** | Full regression, documentation, release and final handoff | In Progress | 663c558 | Full system regression, documentation, release readiness |
 
 ---
 
@@ -113,15 +113,15 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 - [x] Commit 48: `Harden runtime configuration and deployment boundaries`
 
 ### Phase 17 — Full regression, documentation, release and final handoff
-- [x] Commit 49: `Complete full system regression and security verification`
-- [ ] Commit 50: `Finalize setup architecture evaluation and operations guides`
+- [x] Commit 49 (663c558): `Complete full system regression and security verification`
+- [x] Commit 50: `Finalize setup architecture evaluation and operations guides`
 - [ ] Commit 51: `Prepare AccessGuard AI first deployable version`
 
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 17 Commit 49 complete (`Complete full system regression and security verification`). Implemented and verified end-to-end full system regression test (`backend/tests/e2e/test_system_regression.py`) covering the complete user lifecycle from authentication, project creation, DNS TXT verification, scan findings persistence, AI remediation proposals, human review approval, to isolated snapshot validation. Added system security verification (`backend/tests/security/test_system_security.py`) validating IDOR tenant boundaries, SSRF target policies (loopback, private CIDRs, cloud IMDS), and safe DOM patch policy attribute and script scheme rejection. All 34 tests passing cleanly.
-- Next: Phase 17 Commit 50 (`Finalize setup architecture evaluation and operations guides`).
+- Current: Phase 17 Commit 50 complete (`Finalize setup architecture evaluation and operations guides`). Finalized comprehensive system architecture documentation (`docs/ARCHITECTURE.md`), evaluation & benchmark reports for RAG retrieval and multi-agent snapshot validation (`docs/EVALUATION.md`), detailed operations runbook (`docs/OPERATIONS.md`), and updated `README.md` with full container topology, quickstart workflows, test suites, and documentation links.
+- Next: Phase 17 Commit 51 (`Prepare AccessGuard AI first deployable version`). Pre-release verification across backend and frontend test suites, final phase status update, git commit, tag `v1.0.0`, and push to `origin main`.
 
 
 
