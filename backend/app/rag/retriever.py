@@ -89,16 +89,30 @@ class HybridRetriever:
         bm25 = BM25Okapi(corpus_tokens)
         doc_scores = bm25.get_scores(query_tokens)
 
-        # Apply exact criterion ID boost
+        # Apply exact criterion ID boost and term overlap safeguard
         scored_chunks: list[tuple[KnowledgeChunk, float]] = []
         clean_query = query.strip().lower()
+        query_token_set = set(query_tokens)
 
         for chunk, score in zip(all_chunks, doc_scores, strict=False):
-            final_score = float(score)
+            chunk_text = f"{chunk.section_title or ''} {chunk.content}".lower()
+            matched_tokens = sum(1 for qt in query_token_set if qt in chunk_text)
+
+            # Avoid negative BM25 IDF penalties on matching documents (e.g. single-doc corpora or high-df terms)
+            base_score = max(float(score), 0.0)
+            if matched_tokens > 0:
+                base_score += float(matched_tokens)
+
+            final_score = base_score
             if chunk.criterion_id and chunk.criterion_id.lower() in clean_query:
                 final_score += 10.0
-            if chunk.section_title and clean_query in chunk.section_title.lower():
-                final_score += 5.0
+            if chunk.section_title:
+                st_lower = chunk.section_title.lower()
+                if clean_query in st_lower or st_lower in clean_query:
+                    final_score += 5.0
+                elif any(qt in st_lower for qt in query_tokens):
+                    final_score += 2.0
+
             if final_score > 0.0:
                 scored_chunks.append((chunk, final_score))
 
@@ -177,18 +191,20 @@ class HybridRetriever:
             candidate_fusion[c_id]["rrf_score"] += 1.0 / (self.rrf_k + rank_idx)
 
         # Process lexical ranks
-        for rank_idx, (chunk, _score) in enumerate(lexical_results, start=1):
+        for rank_idx, (chunk, score) in enumerate(lexical_results, start=1):
             c_id = chunk.id
             if c_id not in candidate_fusion:
                 candidate_fusion[c_id] = {
                     "dense_rank": None,
                     "dense_score": 0.0,
                     "lexical_rank": rank_idx,
+                    "lexical_score": score,
                     "chunk": chunk,
                     "rrf_score": 0.0,
                 }
             else:
                 candidate_fusion[c_id]["lexical_rank"] = rank_idx
+                candidate_fusion[c_id]["lexical_score"] = score
                 candidate_fusion[c_id]["chunk"] = chunk
             candidate_fusion[c_id]["rrf_score"] += 1.0 / (self.rrf_k + rank_idx)
 
@@ -202,7 +218,7 @@ class HybridRetriever:
         elif mode == "lexical":
             sorted_candidates = sorted(
                 candidate_fusion.items(),
-                key=lambda item: (-(item[1]["lexical_rank"] or 9999),),
+                key=lambda item: item[1].get("lexical_score", 0.0),
                 reverse=True,
             )
         else:
@@ -245,7 +261,9 @@ class HybridRetriever:
                 info["rrf_score"]
                 if mode == "hybrid"
                 else (
-                    info["dense_score"] if mode == "dense" else float(info.get("lexical_rank", 1))
+                    info["dense_score"]
+                    if mode == "dense"
+                    else float(info.get("lexical_score", 1.0))
                 )
             )
 

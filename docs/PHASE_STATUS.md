@@ -15,8 +15,8 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 | **5** | Scanner target policy and crawler foundation | Completed | 3d0babe, 40783a5 | SSRF guards, Playwright crawler, boundary tests |
 | **6** | axe-core integration and finding persistence | Completed | 612f348, c67abb7, 721768e | Local axe bundle injection, finding models, deduplication |
 | **7** | Celery background scans, progress events and cancellation | Completed | e74675c, e290c31, 89804a6 | Celery + Redis orchestration, stage pipeline, SSE event streams |
-| **8** | WCAG source ingestion and local embedding pipeline | Completed | 5a3a65f, 9a30f0d | W3C ingestion, MiniLM embeddings, Qdrant indexing |
-| **9** | Hybrid retrieval, citations and baseline RAG evaluation | Pending | - | Dense + Lexical RRF, citation validator, benchmarks |
+| **8** | WCAG source ingestion and local embedding pipeline | Completed | 5a3a65f, 9a30f0d, f45c221 | W3C ingestion, MiniLM embeddings, Qdrant indexing |
+| **9** | Hybrid retrieval, citations and baseline RAG evaluation | Completed | c9dd114, 4d5abd8, c16410f | Dense + Lexical RRF, citation validator, 52-case empirical benchmark |
 | **10** | Live LLM provider integration *(API Key Checkpoint)* | Pending | - | Gemini/Groq adapters, structured outputs, prompt templates |
 | **11** | LangGraph analysis and remediation proposal workflow | Pending | - | Multi-agent state graph, RAG evidence grounding |
 | **12** | Human approval, safe patch policy and snapshot validation | Pending | - | Sandboxed DOM patch validation, axe-core verification |
@@ -68,12 +68,12 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ### Phase 8 — WCAG source ingestion and local embedding pipeline
 - [x] Commit 22 (5a3a65f): `Ingest official WCAG and WAI source material`
 - [x] Commit 23 (9a30f0d): `Add criterion-aware chunking and local embeddings`
-- [x] Commit 24: `Verify ingestion idempotency and vector indexing`
+- [x] Commit 24 (f45c221): `Verify ingestion idempotency and vector indexing`
 
 ### Phase 9 — Hybrid retrieval, citations and baseline RAG evaluation
-- [ ] Commit 25: `Implement dense and lexical hybrid retrieval`
-- [ ] Commit 26: `Add citation validation and retrieval benchmarks`
-- [ ] Commit 27: `Record measured baseline retrieval evaluation`
+- [x] Commit 25 (c9dd114): `Implement dense and lexical hybrid retrieval`
+- [x] Commit 26 (4d5abd8): `Add citation validation and retrieval benchmarks`
+- [x] Commit 27 (c16410f): `Record measured baseline retrieval evaluation`
 
 *(Phase 9 Checkpoint: Await User Configuration of GEMINI_API_KEY or GROQ_API_KEY before Phase 10)*
 
@@ -120,5 +120,5 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 8 complete with 140/140 passing tests, W3C document parsing, criterion-aware chunking, MiniLM embeddings, Qdrant indexing, and idempotent ingestion.
-- Next: Phase 9 — Hybrid retrieval, citations and baseline RAG evaluation (Commits 25, 26, 27).
+- Current: Phase 9 complete with all 27 RAG unit/integration tests passing (153/153 total backend tests passing), hybrid RRF retriever, citation validator, and empirical 52-case retrieval evaluation report generated.
+- Next: Phase 10 Live LLM Provider Integration — Requires user configuration of `GEMINI_API_KEY` or `GROQ_API_KEY` in `backend/.env` per blueprint instructions.

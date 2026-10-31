@@ -39,11 +39,21 @@ class QdrantVectorStore:
             self.client = client
         else:
             settings = get_settings()
-            if settings.APP_ENV == "test" and "localhost" in settings.QDRANT_URL:
-                # Use in-memory Qdrant client for test isolation when external Qdrant is local default
+            if (settings.APP_ENV == "test" and "localhost" in settings.QDRANT_URL) or settings.QDRANT_URL in (":memory:", "memory"):
+                # Use in-memory Qdrant client for test isolation or explicit memory mode
                 self.client = QdrantClient(":memory:")
             else:
-                self.client = QdrantClient(url=settings.QDRANT_URL)
+                try:
+                    c = QdrantClient(url=settings.QDRANT_URL, timeout=1.5)
+                    c.collection_exists(self.collection_name)
+                    self.client = c
+                except Exception as e:
+                    logger.warning(
+                        "External Qdrant service unreachable; falling back to local in-memory vector store",
+                        url=settings.QDRANT_URL,
+                        error=str(e),
+                    )
+                    self.client = QdrantClient(":memory:")
 
     def ensure_collection_exists(self) -> None:
         """Create the WCAG collection with cosine distance if it does not already exist."""

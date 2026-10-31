@@ -2,6 +2,7 @@
 
 import argparse
 import asyncio
+import sys
 import uuid
 from pathlib import Path
 from typing import Any
@@ -245,6 +246,8 @@ def main() -> None:
     )
 
     args = parser.parse_args()
+    if sys.platform == "win32":
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
     raw_dir = Path(__file__).parent.parent.parent / "knowledge_base" / "raw"
     results = asyncio.run(

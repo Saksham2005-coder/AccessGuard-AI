@@ -64,6 +64,14 @@ class Settings(BaseSettings):
     # Security & SSRF
     TEST_ALLOW_LOOPBACK: bool = False
 
+    @field_validator("GEMINI_API_KEY", "GROQ_API_KEY", "GEMINI_MODEL", "GROQ_MODEL", mode="before")
+    @classmethod
+    def empty_str_to_none(cls, value: object) -> object:
+        """Convert empty strings from environment variables to None."""
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
+
     @field_validator("FRONTEND_ORIGINS", mode="before")
     @classmethod
     def parse_frontend_origins(cls, value: object) -> list[str]:

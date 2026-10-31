@@ -4,12 +4,15 @@ import argparse
 import asyncio
 import json
 import math
+import sys
 from pathlib import Path
 from typing import Any
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
+from app.db.models.knowledge import KnowledgeChunk
 from app.db.session import get_session_maker
 from app.rag.citation_validator import CitationValidator
 from app.rag.retriever import HybridRetriever
@@ -147,6 +150,21 @@ async def run_evaluation_suite(
     retriever = HybridRetriever()
 
     async def _evaluate_with_session(session: AsyncSession) -> dict[str, Any]:
+        if retriever.vector_store.count() == 0:
+            chunks_res = await session.execute(select(KnowledgeChunk))
+            db_chunks = chunks_res.scalars().all()
+            if db_chunks:
+                logger.info(
+                    "Syncing knowledge chunks to vector store for evaluation", count=len(db_chunks)
+                )
+                chunk_texts = [f"{c.section_title or ''} {c.content}" for c in db_chunks]
+                vectors = retriever.embedding_service.embed_texts(chunk_texts)
+                points_to_upsert = [
+                    (c.id, vec, {"criterion_id": c.criterion_id, "chunk_key": c.chunk_key})
+                    for c, vec in zip(db_chunks, vectors, strict=True)
+                ]
+                retriever.vector_store.upsert_chunks(points_to_upsert)
+
         dense_metrics = await evaluate_retrieval_mode(cases, "dense", session, retriever, k=k)
         lexical_metrics = await evaluate_retrieval_mode(cases, "lexical", session, retriever, k=k)
         hybrid_metrics = await evaluate_retrieval_mode(cases, "hybrid", session, retriever, k=k)
@@ -196,6 +214,8 @@ def main() -> None:
     )
 
     args = parser.parse_args()
+    if sys.platform == "win32":
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     results = asyncio.run(run_evaluation_suite(dataset_path=args.dataset, k=args.k))
 
     print("\n================== AccessGuard AI — RAG Evaluation Report ==================")

@@ -1,0 +1,40 @@
+{
+  "dataset_version": "retrieval_cases.jsonl",
+  "total_cases": 52,
+  "top_k": 5,
+  "modes": {
+    "dense": {
+      "mode": "dense",
+      "sample_count": 52,
+      "recall_at_k": 0.42,
+      "precision_at_k": 0.084,
+      "mrr": 0.2263,
+      "ndcg_at_k": 0.2732,
+      "criterion_hit_rate": 0.42,
+      "citation_source_accuracy": 1.0,
+      "abstention_accuracy": 0.0
+    },
+    "lexical": {
+      "mode": "lexical",
+      "sample_count": 52,
+      "recall_at_k": 0.68,
+      "precision_at_k": 0.192,
+      "mrr": 0.5973,
+      "ndcg_at_k": 0.6182,
+      "criterion_hit_rate": 0.68,
+      "citation_source_accuracy": 0.8,
+      "abstention_accuracy": 0.5
+    },
+    "hybrid_rrf": {
+      "mode": "hybrid",
+      "sample_count": 52,
+      "recall_at_k": 0.78,
+      "precision_at_k": 0.156,
+      "mrr": 0.4813,
+      "ndcg_at_k": 0.5563,
+      "criterion_hit_rate": 0.78,
+      "citation_source_accuracy": 1.0,
+      "abstention_accuracy": 0.0
+    }
+  }
+}

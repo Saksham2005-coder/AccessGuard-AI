@@ -42,6 +42,8 @@ scan_artifacts/
 # Local data
 *.sqlite3
 *.db
+backend/data/
+data/
 postgres_data/
 qdrant_data/
 redis_data/

@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.logging import get_logger
 from app.db.models.knowledge import KnowledgeChunk
@@ -54,7 +55,11 @@ class CitationValidator:
                 rejection_reason="No citation references were provided.",
             )
 
-        stmt = select(KnowledgeChunk).where(KnowledgeChunk.id.in_(cited_chunk_ids))
+        stmt = (
+            select(KnowledgeChunk)
+            .options(selectinload(KnowledgeChunk.source))
+            .where(KnowledgeChunk.id.in_(cited_chunk_ids))
+        )
         res = await db.execute(stmt)
         found_chunks = {c.id: c for c in res.scalars().all()}
 
