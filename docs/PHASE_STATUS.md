@@ -108,7 +108,7 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 - [x] Commit 45: `Verify findings approval validation and reporting journeys`
 
 ### Phase 16 — Docker hardening, CI/CD and deployment readiness
-- [ ] Commit 46: `Containerize frontend backend worker and data services`
+- [x] Commit 46: `Containerize frontend backend worker and data services`
 - [ ] Commit 47: `Automate backend frontend scanner and container checks`
 - [ ] Commit 48: `Harden runtime configuration and deployment boundaries`
 
@@ -120,8 +120,8 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 15 completed (`Findings, AI remediation, reports and knowledge UI`). All 23 vitest unit and journey tests passing, Vite production build passing with 0 errors, ESLint passing with 0 errors and 0 warnings, and 205 backend tests passing.
-- Next: Phase 16 Commit 46 (`Containerize frontend backend worker and data services`).
+- Current: Phase 16 Commit 46 complete (`Containerize frontend backend worker and data services`). Multi-stage backend/worker Dockerfile with Python 3.12, uv, Playwright Chromium, pinned axe-core 4.14.0, and non-root execution. Multi-stage frontend Dockerfile with Node 22 builder and hardened Nginx 1.27 runner with SPA routing and security headers. Complete docker-compose.yml configuration with postgres, redis, qdrant, api, celery worker, and frontend, verified with `docker compose config`. Stack initialization script created in `infrastructure/scripts/init-stack.sh`.
+- Next: Phase 16 Commit 47 (`Automate backend frontend scanner and container checks`).
 
 
 

@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -71,9 +72,16 @@ def get_repo_root() -> Path:
 
 def get_axe_bundle_path() -> Path:
     """Locate the pinned local axe-core bundle file."""
+    env_path = os.getenv("AXE_BUNDLE_PATH")
+    if env_path and Path(env_path).exists():
+        return Path(env_path)
+
     repo_root = get_repo_root()
     bundle_path = repo_root / "tools" / "axe" / "node_modules" / "axe-core" / "axe.min.js"
     if not bundle_path.exists():
+        fallback_path = Path("/app/tools/axe/node_modules/axe-core/axe.min.js")
+        if fallback_path.exists():
+            return fallback_path
         raise InfrastructureUnavailableError(
             f"Local axe-core bundle not found at '{bundle_path}'. "
             "Please run 'npm install' in tools/axe to provision the pinned axe-core bundle."
@@ -83,8 +91,24 @@ def get_axe_bundle_path() -> Path:
 
 def get_axe_version() -> str:
     """Discover pinned axe-core version from package metadata."""
+    env_path = os.getenv("AXE_BUNDLE_PATH")
+    if env_path and Path(env_path).exists():
+        pkg_path = Path(env_path).parent / "package.json"
+        if pkg_path.exists():
+            try:
+                with open(pkg_path, encoding="utf-8") as f:
+                    data = json.load(f)
+                    return str(data.get("version", "4.14.0"))
+            except Exception:
+                pass
+
     repo_root = get_repo_root()
     pkg_path = repo_root / "tools" / "axe" / "node_modules" / "axe-core" / "package.json"
+    if not pkg_path.exists():
+        fallback_pkg = Path("/app/tools/axe/node_modules/axe-core/package.json")
+        if fallback_pkg.exists():
+            pkg_path = fallback_pkg
+
     if pkg_path.exists():
         try:
             with open(pkg_path, encoding="utf-8") as f:

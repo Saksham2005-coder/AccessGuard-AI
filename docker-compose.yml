@@ -51,6 +51,90 @@ services:
     networks:
       - accessguard-network
 
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: accessguard-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://accessguard:change-me@postgres:5432/accessguard}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      QDRANT_URL: ${QDRANT_URL:-http://qdrant:6333}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-local-dev-jwt-secret-key-min-32-chars-long-12345}
+      APP_ENV: ${APP_ENV:-production}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:80}
+      LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      AXE_BUNDLE_PATH: /app/tools/axe/node_modules/axe-core/axe.min.js
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/live"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - accessguard-network
+
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: accessguard-worker
+    restart: unless-stopped
+    command: ["uv", "run", "celery", "-A", "app.core.celery_app.celery_app", "worker", "--loglevel=info", "--concurrency=2"]
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://accessguard:change-me@postgres:5432/accessguard}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      QDRANT_URL: ${QDRANT_URL:-http://qdrant:6333}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-local-dev-jwt-secret-key-min-32-chars-long-12345}
+      APP_ENV: ${APP_ENV:-production}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      AXE_BUNDLE_PATH: /app/tools/axe/node_modules/axe-core/axe.min.js
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    networks:
+      - accessguard-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: accessguard-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+    networks:
+      - accessguard-network
+
 volumes:
   postgres_data:
   redis_data:
