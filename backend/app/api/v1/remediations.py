@@ -2,9 +2,16 @@
 
 import uuid
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Query, status
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from app.api.deps import CurrentUserDep, DbDep
+from app.db.models.finding import Finding
+from app.db.models.project import Project
+from app.db.models.remediation import Remediation
+from app.db.models.scan import Scan
+from app.db.models.scan_page import ScanPage
 from app.schemas.remediation import (
     RemediationDecisionRequest,
     RemediationResponse,
@@ -18,6 +25,41 @@ from app.services.remediation_service import (
 )
 
 router = APIRouter(tags=["remediations"])
+
+
+@router.get(
+    "/remediations",
+    response_model=list[RemediationResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def list_remediations(
+    current_user: CurrentUserDep,
+    db: DbDep,
+    finding_id: uuid.UUID | None = Query(default=None),
+    status_filter: str | None = Query(default=None),
+) -> list[RemediationResponse]:
+    """List remediation proposals belonging to the authenticated tenant."""
+    query = (
+        select(Remediation)
+        .options(
+            selectinload(Remediation.approvals),
+            selectinload(Remediation.validation_results),
+        )
+        .join(Finding, Remediation.finding_id == Finding.id)
+        .join(ScanPage, Finding.scan_page_id == ScanPage.id)
+        .join(Scan, ScanPage.scan_id == Scan.id)
+        .join(Project, Scan.project_id == Project.id)
+        .where(Project.owner_id == current_user.id)
+    )
+    if finding_id:
+        query = query.where(Remediation.finding_id == finding_id)
+    if status_filter:
+        query = query.where(Remediation.status == status_filter)
+
+    query = query.order_by(Remediation.created_at.desc())
+    result = await db.execute(query)
+    remediations = result.scalars().all()
+    return [RemediationResponse.model_validate(r) for r in remediations]
 
 
 @router.post(

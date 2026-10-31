@@ -104,7 +104,7 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 
 ### Phase 15 — Findings, AI remediation, reports and knowledge UI
 - [x] Commit 43: `Build findings explorer and evidence detail views`
-- [ ] Commit 44: `Add AI remediation review and report workflows`
+- [x] Commit 44: `Add AI remediation review and report workflows`
 - [ ] Commit 45: `Verify findings approval validation and reporting journeys`
 
 ### Phase 16 — Docker hardening, CI/CD and deployment readiness
@@ -120,8 +120,8 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 15 Commit 43 complete (`Build findings explorer and evidence detail views`). Backend findings API router with tenant security and multi-parameter filtering, frontend findings API client, FindingDetailDrawer modal with copyable DOM selectors, HTML snippet formatting and WCAG criteria tags, and comprehensive FindingsPage explorer table.
-- Next: Commit 44 (`Add AI remediation review and report workflows`).
+- Current: Phase 15 Commit 44 complete (`Add AI remediation review and report workflows`). Implemented backend remediation listing API with tenant security, frontend remediations API client, RemediationsPage with before/after DOM patch comparison diff viewer, human approval modal with reviewer notes, rejection explanation modal, snapshot validation trigger, and comprehensive ReportsPage with compliance health score calculation, WCAG principle evaluation breakdown, structured JSON dataset download, and printable audit report.
+- Next: Commit 45 (`Verify findings approval validation and reporting journeys`).
 
 
 
