@@ -16,7 +16,7 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 | **6** | axe-core integration and finding persistence | Completed | 612f348, c67abb7, 721768e | Local axe bundle injection, finding models, deduplication |
 | **7** | Celery background scans, progress events and cancellation | Completed | e74675c, e290c31, 89804a6 | Celery + Redis orchestration, stage pipeline, SSE event streams |
 | **8** | WCAG source ingestion and local embedding pipeline | Completed | 5a3a65f, 9a30f0d, f45c221 | W3C ingestion, MiniLM embeddings, Qdrant indexing |
-| **9** | Hybrid retrieval, citations and baseline RAG evaluation | Completed | c9dd114, 4d5abd8, c16410f | Dense + Lexical RRF, citation validator, 52-case empirical benchmark |
+| **9** | Hybrid retrieval, citations and baseline RAG evaluation | Completed | c9dd114, 4d5abd8, 70d1da2 | Dense + Lexical RRF, citation validator, 52-case empirical benchmark |
 | **10** | Live LLM provider integration *(API Key Checkpoint)* | Pending | - | Gemini/Groq adapters, structured outputs, prompt templates |
 | **11** | LangGraph analysis and remediation proposal workflow | Pending | - | Multi-agent state graph, RAG evidence grounding |
 | **12** | Human approval, safe patch policy and snapshot validation | Pending | - | Sandboxed DOM patch validation, axe-core verification |
@@ -73,7 +73,7 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ### Phase 9 — Hybrid retrieval, citations and baseline RAG evaluation
 - [x] Commit 25 (c9dd114): `Implement dense and lexical hybrid retrieval`
 - [x] Commit 26 (4d5abd8): `Add citation validation and retrieval benchmarks`
-- [x] Commit 27 (c16410f): `Record measured baseline retrieval evaluation`
+- [x] Commit 27 (70d1da2): `Record measured baseline retrieval evaluation`
 
 *(Phase 9 Checkpoint: Await User Configuration of GEMINI_API_KEY or GROQ_API_KEY before Phase 10)*
 
