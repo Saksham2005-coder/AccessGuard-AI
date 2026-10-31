@@ -1,0 +1,39 @@
+# Official W3C WCAG and WAI Knowledge Sources
+# Source registry for AccessGuard AI authoritative accessibility knowledge base
+
+sources:
+  - source_key: wcag22_recommendation
+    title: "Web Content Accessibility Guidelines (WCAG) 2.2"
+    source_url: "https://www.w3.org/TR/WCAG22/"
+    publisher: "W3C"
+    standard_version: "WCAG 2.2"
+    parser_type: "w3c_tr_single"
+    description: "Normative W3C Recommendation defining accessibility principles, guidelines, and success criteria."
+    is_active: true
+
+  - source_key: wcag22_understanding
+    title: "Understanding WCAG 2.2"
+    source_url: "https://www.w3.org/WAI/WCAG22/Understanding/"
+    publisher: "W3C"
+    standard_version: "WCAG 2.2"
+    parser_type: "w3c_wai_understanding"
+    description: "Non-normative guide explaining intent, key terms, benefits, and examples for each criterion."
+    is_active: true
+
+  - source_key: wcag22_techniques
+    title: "Techniques for WCAG 2.2"
+    source_url: "https://www.w3.org/WAI/WCAG22/Techniques/"
+    publisher: "W3C"
+    standard_version: "WCAG 2.2"
+    parser_type: "w3c_wai_techniques"
+    description: "Sufficient and advisory techniques, common failures, and implementation guidance."
+    is_active: true
+
+  - source_key: wai_aria_apg
+    title: "WAI-ARIA Authoring Practices Guide (APG)"
+    source_url: "https://www.w3.org/WAI/ARIA/apg/"
+    publisher: "W3C"
+    standard_version: "WAI-ARIA 1.2"
+    parser_type: "w3c_wai_apg"
+    description: "Authoring practices guide describing standard accessible design patterns and widget behaviors."
+    is_active: true

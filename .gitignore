@@ -1,0 +1,53 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.pyright/
+
+# Models and generated knowledge data
+.cache/
+.huggingface/
+.sentence_transformers/
+knowledge_base/raw/**
+knowledge_base/processed/**
+!knowledge_base/processed/.gitkeep
+*.safetensors
+*.pt
+*.bin
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Playwright / browser output
+playwright-report/
+test-results/
+artifacts/
+scan_artifacts/
+*.har
+
+# Local data
+*.sqlite3
+*.db
+postgres_data/
+qdrant_data/
+redis_data/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
