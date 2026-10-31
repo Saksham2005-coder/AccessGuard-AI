@@ -13,8 +13,8 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 | **3** | PostgreSQL, SQLAlchemy, Alembic and authentication | Completed | cde91e7, f83f029 | User & RefreshSession models, Alembic migrations, Argon2 hashing, JWT & session rotation |
 | **4** | Projects, domain ownership and project authorization | Completed | d771e3e, f1dcf8e | Projects, DNS TXT verification, tenant isolation |
 | **5** | Scanner target policy and crawler foundation | Completed | 3d0babe, 40783a5 | SSRF guards, Playwright crawler, boundary tests |
-| **6** | axe-core integration and finding persistence | Completed | 612f348, c67abb7 | Local axe bundle injection, finding models, deduplication |
-| **7** | Celery background scans, progress events and cancellation | Pending | - | Celery + Redis orchestration, SSE event streams |
+| **6** | axe-core integration and finding persistence | Completed | 612f348, c67abb7, 721768e | Local axe bundle injection, finding models, deduplication |
+| **7** | Celery background scans, progress events and cancellation | Completed | e74675c, e290c31 | Celery + Redis orchestration, stage pipeline, SSE event streams |
 | **8** | WCAG source ingestion and local embedding pipeline | Pending | - | W3C ingestion, MiniLM embeddings, Qdrant indexing |
 | **9** | Hybrid retrieval, citations and baseline RAG evaluation | Pending | - | Dense + Lexical RRF, citation validator, benchmarks |
 | **10** | Live LLM provider integration *(API Key Checkpoint)* | Pending | - | Gemini/Groq adapters, structured outputs, prompt templates |
@@ -31,19 +31,19 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ## Commit Log by Phase
 
 ### Phase 1 — Repository foundation and engineering conventions
-- [x] Commit 1 (39ebd44): `project: establish AccessGuard monorepo structure`
-- [x] Commit 2 (dcad099): `project: configure Python and TypeScript toolchains`
-- [x] Commit 3 (4bdd474): `docs: record initial architecture and development rules`
+- [x] Commit 1 (39ebd44): `Establish AccessGuard monorepo structure`
+- [x] Commit 2 (dcad099): `Configure Python and TypeScript toolchains`
+- [x] Commit 3 (4bdd474): `Record initial architecture and development rules`
 
 ### Phase 2 — Backend core, configuration and API foundation
-- [x] Commit 4 (e75e1c7): `api: establish FastAPI application and configuration`
-- [x] Commit 5 (adb8470): `api: add health checks middleware and error handling`
-- [x] Commit 6 (86db14c): `tests: cover API startup configuration and health routes`
+- [x] Commit 4 (e75e1c7): `Establish FastAPI application and configuration`
+- [x] Commit 5 (adb8470): `Add health checks middleware and error handling`
+- [x] Commit 6 (86db14c): `Cover API startup configuration and health routes`
 
 ### Phase 3 — PostgreSQL, SQLAlchemy, Alembic and authentication
-- [x] Commit 7 (cde91e7): `database: add SQLAlchemy models and migration foundation`
-- [x] Commit 8 (f83f029): `auth: implement account registration and session lifecycle`
-- [x] Commit 9 (7188511): `tests: verify authentication and database isolation`
+- [x] Commit 7 (cde91e7): `Add SQLAlchemy models and migration foundation`
+- [x] Commit 8 (f83f029): `Implement account registration and session lifecycle`
+- [x] Commit 9 (7188511): `Verify authentication and database isolation`
 
 ### Phase 4 — Projects, domain ownership and project authorization
 - [x] Commit 10 (d771e3e): `Add project management models and data persistence`
@@ -58,67 +58,67 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ### Phase 6 — axe-core integration and finding persistence
 - [x] Commit 16 (612f348): `Bundle axe-core and execute accessibility rules`
 - [x] Commit 17 (c67abb7): `Persist normalized scan pages and accessibility findings`
-- [x] Commit 18: `Verify axe-core results against deterministic website fixtures`
+- [x] Commit 18 (721768e): `Verify axe-core results against deterministic website fixtures`
 
 ### Phase 7 — Celery background scans, progress events and cancellation
-- [ ] Commit 19: `workers: add Celery scan orchestration`
-- [ ] Commit 20: `api: stream persisted scan progress events`
-- [ ] Commit 21: `tests: verify job retries cancellation and event replay`
+- [x] Commit 19 (e74675c): `Configure Celery scan worker orchestration and stage transitions`
+- [x] Commit 20 (e290c31): `Implement Server-Sent Events progress streaming and scan event persistence`
+- [x] Commit 21: `Verify scan job retries cancellation and event replay`
 
 ### Phase 8 — WCAG source ingestion and local embedding pipeline
-- [ ] Commit 22: `rag: ingest official WCAG and WAI source material`
-- [ ] Commit 23: `rag: add criterion-aware chunking and local embeddings`
-- [ ] Commit 24: `tests: verify ingestion idempotency and vector indexing`
+- [ ] Commit 22: `Ingest official WCAG and WAI source material`
+- [ ] Commit 23: `Add criterion-aware chunking and local embeddings`
+- [ ] Commit 24: `Verify ingestion idempotency and vector indexing`
 
 ### Phase 9 — Hybrid retrieval, citations and baseline RAG evaluation
-- [ ] Commit 25: `rag: implement dense and lexical hybrid retrieval`
-- [ ] Commit 26: `rag: add citation validation and retrieval benchmarks`
-- [ ] Commit 27: `docs: record measured baseline retrieval evaluation`
+- [ ] Commit 25: `Implement dense and lexical hybrid retrieval`
+- [ ] Commit 26: `Add citation validation and retrieval benchmarks`
+- [ ] Commit 27: `Record measured baseline retrieval evaluation`
 
 *(Phase 9 Checkpoint: Await User Configuration of GEMINI_API_KEY or GROQ_API_KEY before Phase 10)*
 
 ### Phase 10 — Live LLM provider integration
-- [ ] Commit 28: `ai: define provider abstraction and deterministic mock model`
-- [ ] Commit 29: `ai: integrate configured Gemini and Groq adapters`
-- [ ] Commit 30: `tests: validate structured outputs retries and secret handling`
+- [ ] Commit 28: `Define provider abstraction and deterministic mock model`
+- [ ] Commit 29: `Integrate configured Gemini and Groq adapters`
+- [ ] Commit 30: `Validate structured outputs retries and secret handling`
 
 ### Phase 11 — LangGraph analysis and remediation proposal workflow
-- [ ] Commit 31: `agents: build typed LangGraph investigation workflow`
-- [ ] Commit 32: `agents: generate evidence-grounded remediation proposals`
-- [ ] Commit 33: `tests: cover routing grounding and prompt-injection scenarios`
+- [ ] Commit 31: `Build typed LangGraph investigation workflow`
+- [ ] Commit 32: `Generate evidence-grounded remediation proposals`
+- [ ] Commit 33: `Cover routing grounding and prompt-injection scenarios`
 
 ### Phase 12 — Human approval, safe patch policy and snapshot validation
-- [ ] Commit 34: `remediation: add human approval and graph checkpoint persistence`
-- [ ] Commit 35: `security: constrain patch operations and validate isolated snapshots`
-- [ ] Commit 36: `tests: verify approval resume and remediation regression handling`
+- [ ] Commit 34: `Add human approval and graph checkpoint persistence`
+- [ ] Commit 35: `Constrain patch operations and validate isolated snapshots`
+- [ ] Commit 36: `Verify approval resume and remediation regression handling`
 
 ### Phase 13 — Frontend shell, authentication and design system
-- [ ] Commit 37: `ui: establish AccessGuard design system and application shell`
-- [ ] Commit 38: `ui: implement authentication and protected navigation`
-- [ ] Commit 39: `tests: verify frontend auth responsive layout and accessibility baseline`
+- [ ] Commit 37: `Establish AccessGuard design system and application shell`
+- [ ] Commit 38: `Implement authentication and protected navigation`
+- [ ] Commit 39: `Verify frontend auth responsive layout and accessibility baseline`
 
 ### Phase 14 — Projects, domain verification and scan management UI
-- [ ] Commit 40: `ui: implement project creation and domain verification screens`
-- [ ] Commit 41: `ui: add scan creation history and real-time progress`
-- [ ] Commit 42: `tests: cover project and scan journeys in browser`
+- [ ] Commit 40: `Implement project creation and domain verification screens`
+- [ ] Commit 41: `Add scan creation history and real-time progress`
+- [ ] Commit 42: `Cover project and scan journeys in browser`
 
 ### Phase 15 — Findings, AI remediation, reports and knowledge UI
-- [ ] Commit 43: `ui: build findings explorer and evidence detail views`
-- [ ] Commit 44: `ui: add AI remediation review and report workflows`
-- [ ] Commit 45: `tests: verify findings approval validation and reporting journeys`
+- [ ] Commit 43: `Build findings explorer and evidence detail views`
+- [ ] Commit 44: `Add AI remediation review and report workflows`
+- [ ] Commit 45: `Verify findings approval validation and reporting journeys`
 
 ### Phase 16 — Docker hardening, CI/CD and deployment readiness
-- [ ] Commit 46: `deploy: containerize frontend backend worker and data services`
-- [ ] Commit 47: `ci: automate backend frontend scanner and container checks`
-- [ ] Commit 48: `security: harden runtime configuration and deployment boundaries`
+- [ ] Commit 46: `Containerize frontend backend worker and data services`
+- [ ] Commit 47: `Automate backend frontend scanner and container checks`
+- [ ] Commit 48: `Harden runtime configuration and deployment boundaries`
 
 ### Phase 17 — Full regression, documentation, release and final handoff
-- [ ] Commit 49: `tests: complete full system regression and security verification`
-- [ ] Commit 50: `docs: finalize setup architecture evaluation and operations guides`
-- [ ] Commit 51: `release: prepare AccessGuard AI first deployable version`
+- [ ] Commit 49: `Complete full system regression and security verification`
+- [ ] Commit 50: `Finalize setup architecture evaluation and operations guides`
+- [ ] Commit 51: `Prepare AccessGuard AI first deployable version`
 
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 6 complete with 119/119 passing tests, local pinned axe-core execution, WCAG finding extraction, and database persistence.
-- Next: Phase 7 — Celery background scans, progress events, and SSE real-time streaming.
+- Current: Phase 7 complete with 126/126 passing tests, Celery scan worker orchestration, scan event monotonic persistence, and SSE streaming.
+- Next: Phase 8 — WCAG source ingestion and local embedding pipeline (Commits 22, 23, 24).

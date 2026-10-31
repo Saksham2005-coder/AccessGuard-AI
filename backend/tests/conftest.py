@@ -10,7 +10,9 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
+from sqlalchemy.pool import StaticPool
 
+import app.db.session as session_module
 from app.api.deps import get_current_settings, get_db_session
 from app.config import Settings
 from app.db.base import Base
@@ -44,6 +46,7 @@ async def test_engine() -> AsyncGenerator[AsyncEngine, None]:
     engine = create_async_engine(
         "sqlite+aiosqlite:///:memory:",
         connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
         future=True,
     )
     async with engine.begin() as conn:
@@ -64,9 +67,17 @@ async def db_session(test_engine: AsyncEngine) -> AsyncGenerator[AsyncSession, N
         class_=AsyncSession,
         expire_on_commit=False,
     )
+    old_engine = session_module._engine
+    old_session_maker = session_module._session_maker
+    session_module._engine = test_engine
+    session_module._session_maker = session_factory
+
     async with session_factory() as session:
         yield session
         await session.rollback()
+
+    session_module._engine = old_engine
+    session_module._session_maker = old_session_maker
 
 
 @pytest.fixture
