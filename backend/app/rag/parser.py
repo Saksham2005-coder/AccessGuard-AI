@@ -35,6 +35,29 @@ PRINCIPLE_MAPPING = {
     "4": "Robust",
 }
 
+CRITERION_ID_RE = re.compile(r"(?:Success\s+Criterion\s+)?(\d+\.\d+\.\d+)", re.IGNORECASE)
+CRITERION_LEVEL_RE = re.compile(r"\((?:Level\s+)?(A{1,3})\)", re.IGNORECASE)
+
+
+def extract_criterion_header_parts(heading_text: str) -> tuple[str, str, str | None] | None:
+    """Extract (criterion_id, clean_title, level) from heading text, or None if not a criterion."""
+    m_id = CRITERION_ID_RE.search(heading_text)
+    if not m_id:
+        return None
+    criterion_id = m_id.group(1).strip()
+
+    m_lvl = CRITERION_LEVEL_RE.search(heading_text)
+    level = m_lvl.group(1).strip().upper() if m_lvl else None
+
+    clean_title = re.sub(
+        r"^(?:Success\s+Criterion\s+)?\d+\.\d+\.\d+\s*", "", heading_text, flags=re.IGNORECASE
+    )
+    clean_title = re.sub(
+        r"\s*\((?:Level\s+)?(A{1,3})\)\s*$", "", clean_title, flags=re.IGNORECASE
+    ).strip()
+
+    return criterion_id, clean_title, level
+
 
 class ParsedSection:
     """Canonical section extracted from official accessibility documentation."""
@@ -101,13 +124,11 @@ def parse_w3c_tr_wcag(html: str, base_url: str, source_key: str) -> list[ParsedS
                 continue
 
             heading_text = heading.get_text(" ", strip=True)
-            match = CRITERION_HEADER_RE.search(heading_text)
-            if not match:
+            parts_info = extract_criterion_header_parts(heading_text)
+            if not parts_info:
                 continue
 
-            criterion_id = match.group(1).strip()
-            section_title = match.group(2).strip()
-            level = match.group(3).strip() if match.group(3) else None
+            criterion_id, section_title, level = parts_info
 
             # Infer principle and guideline from criterion ID
             parts = criterion_id.split(".")
@@ -159,11 +180,9 @@ def parse_w3c_tr_wcag(html: str, base_url: str, source_key: str) -> list[ParsedS
             current_guideline = g_match.group(1).strip()
             continue
 
-        c_match = CRITERION_HEADER_RE.search(heading_text)
-        if c_match:
-            criterion_id = c_match.group(1).strip()
-            section_title = c_match.group(2).strip()
-            level = c_match.group(3).strip() if c_match.group(3) else None
+        parts_info = extract_criterion_header_parts(heading_text)
+        if parts_info:
+            criterion_id, section_title, level = parts_info
 
             # Collect subsequent siblings until next heading
             content_nodes: list[str] = [heading_text]
@@ -253,9 +272,9 @@ def parse_generic_w3c_doc(
         if len(content) < 50:
             continue
 
-        c_match = CRITERION_HEADER_RE.search(heading_text)
-        criterion_id = c_match.group(1).strip() if c_match else None
-        level = c_match.group(3).strip() if c_match and c_match.group(3) else None
+        parts_info = extract_criterion_header_parts(heading_text)
+        criterion_id = parts_info[0] if parts_info else None
+        level = parts_info[2] if parts_info else None
 
         section_key = (
             f"{source_key}_{re.sub(r'[^a-zA-Z0-9]+', '_', heading_text).strip('_').lower()[:60]}"

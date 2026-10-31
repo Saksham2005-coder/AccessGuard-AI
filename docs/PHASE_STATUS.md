@@ -14,8 +14,8 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 | **4** | Projects, domain ownership and project authorization | Completed | d771e3e, f1dcf8e | Projects, DNS TXT verification, tenant isolation |
 | **5** | Scanner target policy and crawler foundation | Completed | 3d0babe, 40783a5 | SSRF guards, Playwright crawler, boundary tests |
 | **6** | axe-core integration and finding persistence | Completed | 612f348, c67abb7, 721768e | Local axe bundle injection, finding models, deduplication |
-| **7** | Celery background scans, progress events and cancellation | Completed | e74675c, e290c31 | Celery + Redis orchestration, stage pipeline, SSE event streams |
-| **8** | WCAG source ingestion and local embedding pipeline | Pending | - | W3C ingestion, MiniLM embeddings, Qdrant indexing |
+| **7** | Celery background scans, progress events and cancellation | Completed | e74675c, e290c31, 89804a6 | Celery + Redis orchestration, stage pipeline, SSE event streams |
+| **8** | WCAG source ingestion and local embedding pipeline | Completed | 5a3a65f, 9a30f0d | W3C ingestion, MiniLM embeddings, Qdrant indexing |
 | **9** | Hybrid retrieval, citations and baseline RAG evaluation | Pending | - | Dense + Lexical RRF, citation validator, benchmarks |
 | **10** | Live LLM provider integration *(API Key Checkpoint)* | Pending | - | Gemini/Groq adapters, structured outputs, prompt templates |
 | **11** | LangGraph analysis and remediation proposal workflow | Pending | - | Multi-agent state graph, RAG evidence grounding |
@@ -63,12 +63,12 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ### Phase 7 — Celery background scans, progress events and cancellation
 - [x] Commit 19 (e74675c): `Configure Celery scan worker orchestration and stage transitions`
 - [x] Commit 20 (e290c31): `Implement Server-Sent Events progress streaming and scan event persistence`
-- [x] Commit 21: `Verify scan job retries cancellation and event replay`
+- [x] Commit 21 (89804a6): `Verify scan job retries cancellation and event replay`
 
 ### Phase 8 — WCAG source ingestion and local embedding pipeline
-- [ ] Commit 22: `Ingest official WCAG and WAI source material`
-- [ ] Commit 23: `Add criterion-aware chunking and local embeddings`
-- [ ] Commit 24: `Verify ingestion idempotency and vector indexing`
+- [x] Commit 22 (5a3a65f): `Ingest official WCAG and WAI source material`
+- [x] Commit 23 (9a30f0d): `Add criterion-aware chunking and local embeddings`
+- [x] Commit 24: `Verify ingestion idempotency and vector indexing`
 
 ### Phase 9 — Hybrid retrieval, citations and baseline RAG evaluation
 - [ ] Commit 25: `Implement dense and lexical hybrid retrieval`
@@ -120,5 +120,5 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 7 complete with 126/126 passing tests, Celery scan worker orchestration, scan event monotonic persistence, and SSE streaming.
-- Next: Phase 8 — WCAG source ingestion and local embedding pipeline (Commits 22, 23, 24).
+- Current: Phase 8 complete with 140/140 passing tests, W3C document parsing, criterion-aware chunking, MiniLM embeddings, Qdrant indexing, and idempotent ingestion.
+- Next: Phase 9 — Hybrid retrieval, citations and baseline RAG evaluation (Commits 25, 26, 27).
