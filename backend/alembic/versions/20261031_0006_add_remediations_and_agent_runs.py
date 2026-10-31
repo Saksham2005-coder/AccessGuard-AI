@@ -5,16 +5,17 @@ Revises: 0005_add_knowledge_tables
 Create Date: 2026-10-31 19:35:00.000000
 """
 
-from typing import Sequence, Union
+from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
+from alembic import op
+
 revision: str = "0006_add_remediations_and_agent_runs"
-down_revision: Union[str, None] = "0005_add_knowledge_tables"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = "0005_add_knowledge_tables"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -95,7 +96,9 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_remediations")),
     )
-    op.create_index(op.f("ix_remediations_finding_id"), "remediations", ["finding_id"], unique=False)
+    op.create_index(
+        op.f("ix_remediations_finding_id"), "remediations", ["finding_id"], unique=False
+    )
     op.create_index(op.f("ix_remediations_status"), "remediations", ["status"], unique=False)
 
     # 3. remediation_approvals table
@@ -140,9 +143,13 @@ def upgrade() -> None:
         "validation_results",
         sa.Column("id", sa.UUID(), nullable=False),
         sa.Column("remediation_id", sa.UUID(), nullable=False),
-        sa.Column("validation_mode", sa.String(length=40), nullable=False, server_default="dom_snapshot"),
+        sa.Column(
+            "validation_mode", sa.String(length=40), nullable=False, server_default="dom_snapshot"
+        ),
         sa.Column("passed", sa.Boolean(), nullable=False, server_default=sa.text("false")),
-        sa.Column("original_rule_resolved", sa.Boolean(), nullable=False, server_default=sa.text("false")),
+        sa.Column(
+            "original_rule_resolved", sa.Boolean(), nullable=False, server_default=sa.text("false")
+        ),
         sa.Column(
             "new_violations",
             sa.JSON().with_variant(postgresql.JSONB(astext_type=sa.Text()), "postgresql"),
@@ -177,7 +184,9 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_validation_results_remediation_id"), table_name="validation_results")
     op.drop_table("validation_results")
     op.drop_index(op.f("ix_remediation_approvals_reviewer_id"), table_name="remediation_approvals")
-    op.drop_index(op.f("ix_remediation_approvals_remediation_id"), table_name="remediation_approvals")
+    op.drop_index(
+        op.f("ix_remediation_approvals_remediation_id"), table_name="remediation_approvals"
+    )
     op.drop_table("remediation_approvals")
     op.drop_index(op.f("ix_remediations_status"), table_name="remediations")
     op.drop_index(op.f("ix_remediations_finding_id"), table_name="remediations")

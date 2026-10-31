@@ -1,0 +1,49 @@
+name: AccessGuard AI — Live Provider Smoke Tests
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Run weekly on Sunday midnight
+    - cron: "0 0 * * 0"
+
+permissions:
+  contents: read
+
+jobs:
+  live-smoke:
+    name: Live LLM & Qdrant Smoke Test
+    runs-on: ubuntu-latest
+    if: github.repository == 'Saksham2005-coder/AccessGuard-AI'
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv package manager
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.6.5"
+          cache-dependency-glob: "backend/uv.lock"
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: uv sync --frozen
+
+      - name: Run live provider verification if secret is configured
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          APP_ENV: testing
+        run: |
+          if [ -n "$GEMINI_API_KEY" ]; then
+            echo "GEMINI_API_KEY is configured. Running live provider smoke tests..."
+            uv run pytest tests/ai/test_live_providers.py -v
+          else
+            echo "GEMINI_API_KEY is not configured in repository secrets. Skipping live smoke tests."
+          fi

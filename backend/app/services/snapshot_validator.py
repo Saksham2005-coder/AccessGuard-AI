@@ -59,7 +59,7 @@ class SnapshotValidator:
             effective_html = (
                 '<!DOCTYPE html>\n<html lang="en">\n<head>\n'
                 '  <meta charset="utf-8">\n'
-                '  <title>Isolated Accessibility Snapshot</title>\n'
+                "  <title>Isolated Accessibility Snapshot</title>\n"
                 "</head>\n<body>\n"
                 "  <main>\n"
                 "    <h1>Isolated Accessibility Snapshot</h1>\n"

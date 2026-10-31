@@ -160,4 +160,6 @@ class ValidationResult(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
 
     # Relationships
-    remediation: Mapped["Remediation"] = relationship("Remediation", back_populates="validation_results")
+    remediation: Mapped["Remediation"] = relationship(
+        "Remediation", back_populates="validation_results"
+    )

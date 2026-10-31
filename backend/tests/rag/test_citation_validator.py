@@ -52,7 +52,10 @@ async def test_citation_validator_validates_existing_chunks(
     assert result.is_valid is True
     assert result.should_abstain is False
     assert len(result.verified_citations) == 1
-    assert result.verified_citations[0].canonical_source_url == "https://www.w3.org/TR/WCAG22/#non-text-content"
+    assert (
+        result.verified_citations[0].canonical_source_url
+        == "https://www.w3.org/TR/WCAG22/#non-text-content"
+    )
     assert result.verified_citations[0].criterion_id == "1.1.1"
 
 

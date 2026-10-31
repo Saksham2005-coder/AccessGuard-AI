@@ -5,11 +5,12 @@ Revises: 0001_initial_auth
 Create Date: 2026-10-31 16:42:00 UTC
 
 """
+
 from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
+
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "0002_add_projects"
@@ -43,7 +44,11 @@ def upgrade() -> None:
         sa.Column(
             "project_id",
             sa.UUID(as_uuid=True),
-            sa.ForeignKey("projects.id", ondelete="CASCADE", name="fk_project_domain_verifications_project_id_projects"),
+            sa.ForeignKey(
+                "projects.id",
+                ondelete="CASCADE",
+                name="fk_project_domain_verifications_project_id_projects",
+            ),
             nullable=False,
         ),
         sa.Column("domain", sa.String(length=253), nullable=False),
@@ -63,7 +68,9 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.drop_index("ix_project_domain_verifications_project_id", table_name="project_domain_verifications")
+    op.drop_index(
+        "ix_project_domain_verifications_project_id", table_name="project_domain_verifications"
+    )
     op.drop_table("project_domain_verifications")
     op.drop_index("ix_projects_base_domain", table_name="projects")
     op.drop_index("ix_projects_owner_id", table_name="projects")

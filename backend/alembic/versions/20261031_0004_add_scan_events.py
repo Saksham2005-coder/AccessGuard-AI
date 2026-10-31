@@ -5,16 +5,17 @@ Revises: 0003_add_scans_and_findings
 Create Date: 2026-10-31 17:07:00.000000
 """
 
-from typing import Sequence, Union
+from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
+from alembic import op
+
 revision: str = "0004_add_scan_events"
-down_revision: Union[str, None] = "0003_add_scans_and_findings"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = "0003_add_scans_and_findings"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:

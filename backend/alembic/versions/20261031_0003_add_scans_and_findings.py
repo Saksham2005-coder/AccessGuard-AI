@@ -5,16 +5,17 @@ Revises: 0002_add_projects
 Create Date: 2026-10-31 17:02:00.000000
 """
 
-from typing import Sequence, Union
+from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
+from alembic import op
+
 revision: str = "0003_add_scans_and_findings"
-down_revision: Union[str, None] = "0002_add_projects"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = "0002_add_projects"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -90,7 +91,9 @@ def upgrade() -> None:
         sa.UniqueConstraint("scan_id", "normalized_url", name="uq_scan_pages_scan_normalized_url"),
     )
     op.create_index(op.f("ix_scan_pages_scan_id"), "scan_pages", ["scan_id"], unique=False)
-    op.create_index(op.f("ix_scan_pages_normalized_url"), "scan_pages", ["normalized_url"], unique=False)
+    op.create_index(
+        op.f("ix_scan_pages_normalized_url"), "scan_pages", ["normalized_url"], unique=False
+    )
 
     # 3. Findings table
     op.create_table(
@@ -151,7 +154,9 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_finding_nodes")),
     )
-    op.create_index(op.f("ix_finding_nodes_finding_id"), "finding_nodes", ["finding_id"], unique=False)
+    op.create_index(
+        op.f("ix_finding_nodes_finding_id"), "finding_nodes", ["finding_id"], unique=False
+    )
 
 
 def downgrade() -> None:

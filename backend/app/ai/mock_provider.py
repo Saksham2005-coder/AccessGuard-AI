@@ -72,7 +72,11 @@ class MockLLMProvider(LLMProvider):
 
         # 1. FindingAnalysis Mock
         if issubclass(output_schema, FindingAnalysis):
-            crit_ids = ["1.1.1"] if "alt" in rule_id or "image" in rule_id else ["1.4.3" if "contrast" in rule_id else "4.1.2"]
+            crit_ids = (
+                ["1.1.1"]
+                if "alt" in rule_id or "image" in rule_id
+                else ["1.4.3" if "contrast" in rule_id else "4.1.2"]
+            )
             result = FindingAnalysis(
                 summary=f"Automated finding for '{rule_id}': element requires accessible markup.",
                 likely_root_cause=f"The element matching '{selector}' violates WCAG requirements for {rule_id}.",
@@ -142,7 +146,11 @@ class MockLLMProvider(LLMProvider):
                 accepted_for_human_review=not has_rejection,
                 rejection_reasons=["Simulated policy rejection"] if has_rejection else [],
                 evidence_complete=bool(evidence_ids),
-                policy_checks_passed=["safe_dom_attributes", "grounded_citations", "bounded_snippet"],
+                policy_checks_passed=[
+                    "safe_dom_attributes",
+                    "grounded_citations",
+                    "bounded_snippet",
+                ],
                 policy_checks_failed=["disallowed_attributes"] if has_rejection else [],
             )
             return result  # type: ignore[return-value]

@@ -106,7 +106,11 @@ class GeminiLLMProvider(LLMProvider):
             except errors.ClientError as e:
                 err_msg = str(e)
                 code = getattr(e, "code", None)
-                if code in (401, 403) or "API_KEY_INVALID" in err_msg or "unauthenticated" in err_msg.lower():
+                if (
+                    code in (401, 403)
+                    or "API_KEY_INVALID" in err_msg
+                    or "unauthenticated" in err_msg.lower()
+                ):
                     raise LLMAuthenticationError(
                         f"Gemini API authentication failed: {err_msg}",
                         provider="gemini",

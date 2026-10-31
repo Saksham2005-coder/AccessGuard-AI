@@ -105,7 +105,12 @@ async def create_or_run_remediation_proposal(
     )
     existing_res = await db.execute(stmt)
     existing_remediation = existing_res.scalars().first()
-    if existing_remediation and existing_remediation.status in ("proposed", "needs_review", "approved", "validated"):
+    if existing_remediation and existing_remediation.status in (
+        "proposed",
+        "needs_review",
+        "approved",
+        "validated",
+    ):
         return existing_remediation
 
     # Compile the LangGraph investigation workflow with human approval interrupt enabled
@@ -233,9 +238,13 @@ async def record_approval_decision(
     """Record human approval or rejection decision and resume LangGraph checkpoint."""
     decision_clean = decision.strip().lower()
     if decision_clean not in ("approved", "rejected"):
-        raise ValidationError(f"Invalid approval decision '{decision}'. Must be 'approved' or 'rejected'.")
+        raise ValidationError(
+            f"Invalid approval decision '{decision}'. Must be 'approved' or 'rejected'."
+        )
 
-    remediation, finding, project = await get_remediation_and_check_ownership(db, remediation_id, user_id)
+    remediation, finding, project = await get_remediation_and_check_ownership(
+        db, remediation_id, user_id
+    )
 
     # Idempotent / Conflict gate: Prevent duplicate decisions
     if remediation.status in ("approved", "rejected", "validated", "validation_failed"):
@@ -280,7 +289,9 @@ async def record_approval_decision(
                 "passed": True,
                 "original_rule_resolved": True,
                 "new_violations": [],
-                "details": {"note": "Snapshot validation verified without external resource loading."},
+                "details": {
+                    "note": "Snapshot validation verified without external resource loading."
+                },
             }
             passed = bool(val_result_data.get("passed", True))
             remediation.status = "validated" if passed else "validation_failed"
@@ -324,7 +335,9 @@ async def run_remediation_snapshot_validation(
     validator: Any = None,
 ) -> Remediation:
     """Execute isolated DOM snapshot validation against an approved or proposed remediation."""
-    remediation, finding, _project = await get_remediation_and_check_ownership(db, remediation_id, user_id)
+    remediation, finding, _project = await get_remediation_and_check_ownership(
+        db, remediation_id, user_id
+    )
 
     from app.services.snapshot_validator import SnapshotValidator
 

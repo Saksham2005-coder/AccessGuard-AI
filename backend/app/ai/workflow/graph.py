@@ -32,7 +32,10 @@ def route_after_knowledge_retrieval(
     state: AccessGuardGraphState,
 ) -> Literal["mark_manual_review", "finding_analysis"]:
     """Route to manual review if grounding evidence is absent; else proceed to analysis."""
-    if not state.get("evidence_sufficient", False) or state.get("status") == "manual_review_required":
+    if (
+        not state.get("evidence_sufficient", False)
+        or state.get("status") == "manual_review_required"
+    ):
         return "mark_manual_review"
     return "finding_analysis"
 

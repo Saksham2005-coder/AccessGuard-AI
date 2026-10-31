@@ -90,7 +90,14 @@ def test_review_node_rejects_hallucinated_citations() -> None:
             "problem": "Missing alt attribute",
             "recommendation": "Add alt='logo'",
             "patch_format": "dom_operations",
-            "patch_operations": [{"operation": "set_attribute", "selector": "img", "attribute": "alt", "value": "logo"}],
+            "patch_operations": [
+                {
+                    "operation": "set_attribute",
+                    "selector": "img",
+                    "attribute": "alt",
+                    "value": "logo",
+                }
+            ],
             "expected_effect": "Screen reader announces logo",
             "manual_checks": ["Inspect image"],
             "evidence_chunk_ids": ["99999999-9999-9999-9999-999999999999"],  # Hallucinated ID!
@@ -102,7 +109,9 @@ def test_review_node_rejects_hallucinated_citations() -> None:
     assert review["review_result"]["accepted_for_human_review"] is False
     assert review["review_result"]["evidence_complete"] is False
     assert "citation_grounding" in review["review_result"]["policy_checks_failed"]
-    assert any("ungrounded evidence chunks" in r for r in review["review_result"]["rejection_reasons"])
+    assert any(
+        "ungrounded evidence chunks" in r for r in review["review_result"]["rejection_reasons"]
+    )
 
 
 def test_review_node_rejects_unsafe_attributes_and_script_schemes() -> None:
@@ -116,8 +125,18 @@ def test_review_node_rejects_unsafe_attributes_and_script_schemes() -> None:
             "recommendation": "Add inline script",
             "patch_format": "dom_operations",
             "patch_operations": [
-                {"operation": "set_attribute", "selector": "button", "attribute": "onclick", "value": "alert(1)"},
-                {"operation": "set_attribute", "selector": "a", "attribute": "aria-label", "value": "javascript:void(0)"},
+                {
+                    "operation": "set_attribute",
+                    "selector": "button",
+                    "attribute": "onclick",
+                    "value": "alert(1)",
+                },
+                {
+                    "operation": "set_attribute",
+                    "selector": "a",
+                    "attribute": "aria-label",
+                    "value": "javascript:void(0)",
+                },
             ],
             "expected_effect": "None",
             "manual_checks": [],

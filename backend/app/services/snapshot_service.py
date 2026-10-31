@@ -17,7 +17,9 @@ logger = get_logger("snapshot_service")
 EVENT_HANDLER_PATTERN = re.compile(r"^on[a-z]+", re.IGNORECASE)
 
 # Dangerous URL schemes that must be stripped
-DANGEROUS_SCHEMES_PATTERN = re.compile(r"^\s*(javascript|vbscript|data\s*:\s*text/html)", re.IGNORECASE)
+DANGEROUS_SCHEMES_PATTERN = re.compile(
+    r"^\s*(javascript|vbscript|data\s*:\s*text/html)", re.IGNORECASE
+)
 
 
 def compute_snapshot_hash(html: str) -> str:
@@ -28,10 +30,7 @@ def compute_snapshot_hash(html: str) -> str:
 
 def compute_patch_hash(operations: list[dict[str, Any] | PatchOperation]) -> str:
     """Compute SHA-256 checksum of canonical patch operations JSON."""
-    clean_ops = [
-        op.model_dump() if isinstance(op, PatchOperation) else op
-        for op in operations
-    ]
+    clean_ops = [op.model_dump() if isinstance(op, PatchOperation) else op for op in operations]
     canonical_json = json.dumps(clean_ops, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()
 
@@ -134,12 +133,14 @@ def apply_dom_patch(
                 selector=op.selector,
                 operation=op.operation,
             )
-            applied_logs.append({
-                "operation": op.operation,
-                "selector": op.selector,
-                "matched_count": 0,
-                "status": "selector_not_found",
-            })
+            applied_logs.append(
+                {
+                    "operation": op.operation,
+                    "selector": op.selector,
+                    "matched_count": 0,
+                    "status": "selector_not_found",
+                }
+            )
             continue
 
         matched_count = 0
@@ -152,12 +153,14 @@ def apply_dom_patch(
             elif op.operation == "replace_text" and op.value is not None:
                 elem.string = op.value
 
-        applied_logs.append({
-            "operation": op.operation,
-            "selector": op.selector,
-            "matched_count": matched_count,
-            "attribute": op.attribute,
-            "status": "applied",
-        })
+        applied_logs.append(
+            {
+                "operation": op.operation,
+                "selector": op.selector,
+                "matched_count": matched_count,
+                "attribute": op.attribute,
+                "status": "applied",
+            }
+        )
 
     return str(soup), applied_logs

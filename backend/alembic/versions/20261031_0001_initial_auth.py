@@ -1,15 +1,16 @@
 """Initial authentication schema for users and refresh sessions.
 
 Revision ID: 0001_initial_auth
-Revises: 
+Revises:
 Create Date: 2026-10-31 16:35:00 UTC
 
 """
+
 from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
+
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "0001_initial_auth"
@@ -47,7 +48,9 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.TIMESTAMP(timezone=True), nullable=False),
     )
     op.create_index("ix_refresh_sessions_user_id", "refresh_sessions", ["user_id"], unique=False)
-    op.create_index("ix_refresh_sessions_token_hash", "refresh_sessions", ["token_hash"], unique=True)
+    op.create_index(
+        "ix_refresh_sessions_token_hash", "refresh_sessions", ["token_hash"], unique=True
+    )
 
 
 def downgrade() -> None:

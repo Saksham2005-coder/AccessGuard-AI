@@ -53,8 +53,18 @@ def test_apply_dom_patch_allowlisted_operations() -> None:
     html = '<div class="banner"><img src="hero.jpg" class="hero"><button class="btn">Click</button></div>'
 
     operations = [
-        {"operation": "set_attribute", "selector": "img.hero", "attribute": "alt", "value": "Hero presentation banner"},
-        {"operation": "set_attribute", "selector": "button.btn", "attribute": "aria-label", "value": "Submit form"},
+        {
+            "operation": "set_attribute",
+            "selector": "img.hero",
+            "attribute": "alt",
+            "value": "Hero presentation banner",
+        },
+        {
+            "operation": "set_attribute",
+            "selector": "button.btn",
+            "attribute": "aria-label",
+            "value": "Submit form",
+        },
         {"operation": "replace_text", "selector": "button.btn", "value": "Submit Action"},
     ]
 
@@ -75,22 +85,45 @@ def test_apply_dom_patch_rejects_unsafe_attributes() -> None:
     with pytest.raises(PolicyViolationError) as exc_info:
         apply_dom_patch(
             html,
-            [{"operation": "set_attribute", "selector": "img.hero", "attribute": "onload", "value": "steal()"}],
+            [
+                {
+                    "operation": "set_attribute",
+                    "selector": "img.hero",
+                    "attribute": "onload",
+                    "value": "steal()",
+                }
+            ],
         )
-    assert "violates safe accessibility patch policy" in str(exc_info.value) or "prohibited" in str(exc_info.value)
+    assert "violates safe accessibility patch policy" in str(exc_info.value) or "prohibited" in str(
+        exc_info.value
+    )
 
     # 2. Arbitrary non-allowlisted attribute
     with pytest.raises(PolicyViolationError):
         apply_dom_patch(
             html,
-            [{"operation": "set_attribute", "selector": "img.hero", "attribute": "data-unsafe-attr", "value": "xyz"}],
+            [
+                {
+                    "operation": "set_attribute",
+                    "selector": "img.hero",
+                    "attribute": "data-unsafe-attr",
+                    "value": "xyz",
+                }
+            ],
         )
 
     # 3. Script URI scheme in value
     with pytest.raises(PolicyViolationError):
         apply_dom_patch(
             html,
-            [{"operation": "set_attribute", "selector": "img.hero", "attribute": "title", "value": "javascript:alert(1)"}],
+            [
+                {
+                    "operation": "set_attribute",
+                    "selector": "img.hero",
+                    "attribute": "title",
+                    "value": "javascript:alert(1)",
+                }
+            ],
         )
 
 

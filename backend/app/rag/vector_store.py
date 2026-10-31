@@ -39,7 +39,9 @@ class QdrantVectorStore:
             self.client = client
         else:
             settings = get_settings()
-            if (settings.APP_ENV == "test" and "localhost" in settings.QDRANT_URL) or settings.QDRANT_URL in (":memory:", "memory"):
+            if (
+                settings.APP_ENV == "test" and "localhost" in settings.QDRANT_URL
+            ) or settings.QDRANT_URL in (":memory:", "memory"):
                 # Use in-memory Qdrant client for test isolation or explicit memory mode
                 self.client = QdrantClient(":memory:")
             else:

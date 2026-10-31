@@ -215,11 +215,14 @@ async def test_gemini_fails_after_max_retries_on_persistent_rate_limit() -> None
     async def mock_rate_limit(*_args, **_kwargs):
         raise errors.ClientError(429, "RESOURCE_EXHAUSTED: Quota exceeded", None)
 
-    with patch.object(
-        provider._client.aio.models,
-        "generate_content",
-        side_effect=mock_rate_limit,
-    ), pytest.raises(LLMRateLimitError) as exc_info:
+    with (
+        patch.object(
+            provider._client.aio.models,
+            "generate_content",
+            side_effect=mock_rate_limit,
+        ),
+        pytest.raises(LLMRateLimitError) as exc_info,
+    ):
         await provider.generate_structured(
             system_prompt="Test",
             user_payload={},
@@ -240,13 +243,18 @@ async def test_gemini_context_limit_error_is_not_retryable() -> None:
     async def mock_context_error(*_args, **_kwargs):
         nonlocal call_count
         call_count += 1
-        raise errors.ClientError(400, "Maximum token context length exceeded: token count 1500000", None)
+        raise errors.ClientError(
+            400, "Maximum token context length exceeded: token count 1500000", None
+        )
 
-    with patch.object(
-        provider._client.aio.models,
-        "generate_content",
-        side_effect=mock_context_error,
-    ), pytest.raises(LLMContextLimitError) as exc_info:
+    with (
+        patch.object(
+            provider._client.aio.models,
+            "generate_content",
+            side_effect=mock_context_error,
+        ),
+        pytest.raises(LLMContextLimitError) as exc_info,
+    ):
         await provider.generate_structured(
             system_prompt="Test",
             user_payload={},
@@ -277,11 +285,14 @@ async def test_groq_retryable_vs_non_retryable_errors() -> None:
         auth_calls += 1
         raise auth_err
 
-    with patch.object(
-        groq_provider._client.chat.completions,
-        "create",
-        side_effect=mock_auth_fail,
-    ), pytest.raises(LLMAuthenticationError) as exc_info:
+    with (
+        patch.object(
+            groq_provider._client.chat.completions,
+            "create",
+            side_effect=mock_auth_fail,
+        ),
+        pytest.raises(LLMAuthenticationError) as exc_info,
+    ):
         await groq_provider.generate_structured(
             system_prompt="Test",
             user_payload={},

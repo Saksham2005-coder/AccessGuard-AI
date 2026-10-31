@@ -31,7 +31,9 @@ async def record_agent_run(
     """Persist structured agent execution audit record without secrets or private full DOM."""
     # Convert IDs to UUID instances
     scan_uuid = uuid.UUID(str(scan_id)) if isinstance(scan_id, str) else scan_id
-    finding_uuid = uuid.UUID(str(finding_id)) if finding_id and isinstance(finding_id, str) else finding_id
+    finding_uuid = (
+        uuid.UUID(str(finding_id)) if finding_id and isinstance(finding_id, str) else finding_id
+    )
 
     # Sanitize summaries to guarantee no API keys or sensitive auth tokens are persisted
     safe_input = censor_sensitive_dict(input_summary)
@@ -109,7 +111,8 @@ async def persist_workflow_run_record(
         output_summary=output_summary,
         provider=metadata.get("remediation_provider") or metadata.get("analysis_provider"),
         model_name=metadata.get("remediation_model") or metadata.get("analysis_model"),
-        prompt_version=metadata.get("remediation_prompt_version") or metadata.get("analysis_prompt_version"),
+        prompt_version=metadata.get("remediation_prompt_version")
+        or metadata.get("analysis_prompt_version"),
         duration_ms=duration_ms,
         error_code=error_code,
     )

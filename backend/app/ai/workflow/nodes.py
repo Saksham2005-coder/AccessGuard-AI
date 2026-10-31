@@ -22,7 +22,8 @@ def scan_context_node(state: AccessGuardGraphState) -> dict[str, Any]:
         logger.warning("Empty finding provided in graph state", finding_id=state.get("finding_id"))
         return {
             "status": "manual_review_required",
-            "errors": state.get("errors", []) + [{"node": "scan_context", "error": "No finding data provided"}],
+            "errors": state.get("errors", [])
+            + [{"node": "scan_context", "error": "No finding data provided"}],
         }
 
     is_incomplete = bool(finding.get("is_incomplete", False))
@@ -44,10 +45,12 @@ def scan_context_node(state: AccessGuardGraphState) -> dict[str, Any]:
 
     if is_incomplete:
         updates["status"] = "manual_review_required"
-        updates["errors"].append({
-            "node": "scan_context",
-            "error": "Automated scan marked finding as incomplete; human verification required.",
-        })
+        updates["errors"].append(
+            {
+                "node": "scan_context",
+                "error": "Automated scan marked finding as incomplete; human verification required.",
+            }
+        )
 
     return updates
 
@@ -93,10 +96,13 @@ async def knowledge_retrieval_node(
                     "retrieved_evidence": [],
                     "evidence_sufficient": False,
                     "status": "manual_review_required",
-                    "errors": state.get("errors", []) + [{
-                        "node": "knowledge_retrieval",
-                        "error": "Insufficient grounding evidence retrieved; abstaining from automated proposal.",
-                    }],
+                    "errors": state.get("errors", [])
+                    + [
+                        {
+                            "node": "knowledge_retrieval",
+                            "error": "Insufficient grounding evidence retrieved; abstaining from automated proposal.",
+                        }
+                    ],
                 }
 
             formatted_evidence = [
@@ -124,19 +130,25 @@ async def knowledge_retrieval_node(
                 "retrieved_evidence": [],
                 "evidence_sufficient": False,
                 "status": "manual_review_required",
-                "errors": state.get("errors", []) + [{"node": "knowledge_retrieval", "error": str(e)}],
+                "errors": state.get("errors", [])
+                + [{"node": "knowledge_retrieval", "error": str(e)}],
             }
 
     # If no retriever provided and no preloaded evidence, route to manual review
-    logger.warning("No retriever service available; marking manual review", finding_id=state.get("finding_id"))
+    logger.warning(
+        "No retriever service available; marking manual review", finding_id=state.get("finding_id")
+    )
     return {
         "retrieved_evidence": [],
         "evidence_sufficient": False,
         "status": "manual_review_required",
-        "errors": state.get("errors", []) + [{
-            "node": "knowledge_retrieval",
-            "error": "No RAG retriever configured for finding investigation.",
-        }],
+        "errors": state.get("errors", [])
+        + [
+            {
+                "node": "knowledge_retrieval",
+                "error": "No RAG retriever configured for finding investigation.",
+            }
+        ],
     }
 
 
@@ -174,15 +186,19 @@ async def finding_analysis_node(
         duration_ms = int((time.monotonic() - start_time) * 1000)
 
         metadata = dict(state.get("metadata", {}))
-        metadata.update({
-            "analysis_provider": llm.provider_name,
-            "analysis_model": llm.default_model,
-            "analysis_prompt_version": "finding_analysis_v1",
-            "analysis_duration_ms": duration_ms,
-        })
+        metadata.update(
+            {
+                "analysis_provider": llm.provider_name,
+                "analysis_model": llm.default_model,
+                "analysis_prompt_version": "finding_analysis_v1",
+                "analysis_duration_ms": duration_ms,
+            }
+        )
 
         analysis_dict = analysis.model_dump()
-        next_status = "manual_review_required" if analysis.needs_manual_review else "analysis_completed"
+        next_status = (
+            "manual_review_required" if analysis.needs_manual_review else "analysis_completed"
+        )
 
         return {
             "analysis": analysis_dict,
@@ -241,12 +257,14 @@ async def remediation_proposal_node(
         duration_ms = int((time.monotonic() - start_time) * 1000)
 
         metadata = dict(state.get("metadata", {}))
-        metadata.update({
-            "remediation_provider": llm.provider_name,
-            "remediation_model": llm.default_model,
-            "remediation_prompt_version": "remediation_proposal_v1",
-            "remediation_duration_ms": duration_ms,
-        })
+        metadata.update(
+            {
+                "remediation_provider": llm.provider_name,
+                "remediation_model": llm.default_model,
+                "remediation_prompt_version": "remediation_proposal_v1",
+                "remediation_duration_ms": duration_ms,
+            }
+        )
 
         return {
             "remediation_proposal": proposal.model_dump(),
@@ -357,11 +375,13 @@ def human_approval_node(state: AccessGuardGraphState) -> dict[str, Any]:
     """
     decision = state.get("human_decision")
     if not decision:
-        res = interrupt({
-            "message": "Accessibility remediation proposed and passed policy review. Awaiting human approval.",
-            "finding_id": state.get("finding_id"),
-            "remediation_proposal": state.get("remediation_proposal"),
-        })
+        res = interrupt(
+            {
+                "message": "Accessibility remediation proposed and passed policy review. Awaiting human approval.",
+                "finding_id": state.get("finding_id"),
+                "remediation_proposal": state.get("remediation_proposal"),
+            }
+        )
         if isinstance(res, dict):
             decision = res
         elif isinstance(res, str):
