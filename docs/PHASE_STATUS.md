@@ -87,13 +87,13 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 - [x] Commit 32 (00e0979): `Generate evidence-grounded remediation proposals`
 - [x] Commit 33 (adc8659): `Cover routing grounding and prompt-injection scenarios`
 
-### Phase 12 — Human approval, safe patch policy and snapshot validation
+### Phase 12 — Human approval, safe patch policy and snapshot validation (COMPLETED)
 - [x] Commit 34 (cd62e91): `Add human approval and graph checkpoint persistence`
 - [x] Commit 35 (613a195): `Constrain patch operations and validate isolated snapshots`
-- [x] Commit 36 (42ab47f): `Verify approval resume and remediation regression handling`
+- [x] Commit 36 (ed524b9): `Verify approval resume and remediation regression handling`
 
 ### Phase 13 — Frontend shell, authentication and design system
-- [ ] Commit 37: `Establish AccessGuard design system and application shell`
+- [x] Commit 37: `Establish AccessGuard design system and application shell`
 - [ ] Commit 38: `Implement authentication and protected navigation`
 - [ ] Commit 39: `Verify frontend auth responsive layout and accessibility baseline`
 
@@ -120,5 +120,6 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 11 complete with all 36 AI and LangGraph workflow unit/integration tests passing (189/189 total backend tests passing). Multi-agent investigation workflow with typed StateGraph, grounded RAG evidence retrieval, prompt injection safe input structuring, evidence citation validation, safe DOM patch attribute policy verification, bounded 1-retry regeneration, and agent execution audit persistence.
-- Next: Phase 12 — Human approval, safe patch policy and snapshot validation (Commit 34: `Add human approval and graph checkpoint persistence`).
+- Current: Phase 13 Commit 37 complete (`Establish AccessGuard design system and application shell`). Component design system (Button, Input, Card, Badge, Skeleton, Dialog, Table, EmptyState), responsive layout shell with desktop sidebar, mobile drawer, skip-to-content accessibility link, page shells, TanStack Query provider, and React Router navigation configured with clean ESLint and TypeScript build.
+- Next: Commit 38 (`Implement authentication and protected navigation`).
+
