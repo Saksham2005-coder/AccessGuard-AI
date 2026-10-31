@@ -315,3 +315,45 @@ async def record_approval_decision(
     await db.commit()
     await db.refresh(remediation, ["approvals", "validation_results"])
     return remediation
+
+
+async def run_remediation_snapshot_validation(
+    db: AsyncSession,
+    remediation_id: uuid.UUID,
+    user_id: uuid.UUID,
+    validator: Any = None,
+) -> Remediation:
+    """Execute isolated DOM snapshot validation against an approved or proposed remediation."""
+    remediation, finding, _project = await get_remediation_and_check_ownership(db, remediation_id, user_id)
+
+    from app.services.snapshot_validator import SnapshotValidator
+
+    val = validator or SnapshotValidator()
+    patch_ops = remediation.patch_payload.get("patch_operations", [])
+    snapshot_html = finding.html_snippet or "<div></div>"
+
+    remediation.status = "validating"
+    await db.commit()
+
+    val_result = await val.validate_snapshot(
+        snapshot_html=snapshot_html,
+        original_rule_id=finding.axe_rule_id,
+        patch_operations=patch_ops,
+        finding_id=str(finding.id),
+    )
+
+    passed = bool(val_result.get("passed", False))
+    remediation.status = "validated" if passed else "validation_failed"
+
+    val_record = ValidationResult(
+        remediation_id=remediation.id,
+        validation_mode=val_result.get("validation_mode", "dom_snapshot"),
+        passed=passed,
+        original_rule_resolved=bool(val_result.get("original_rule_resolved", False)),
+        new_violations=val_result.get("new_violations", []),
+        details=val_result.get("details", {}),
+    )
+    db.add(val_record)
+    await db.commit()
+    await db.refresh(remediation, ["approvals", "validation_results"])
+    return remediation

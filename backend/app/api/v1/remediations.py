@@ -14,6 +14,7 @@ from app.services.remediation_service import (
     create_or_run_remediation_proposal,
     get_remediation_and_check_ownership,
     record_approval_decision,
+    run_remediation_snapshot_validation,
 )
 
 router = APIRouter(tags=["remediations"])
@@ -112,7 +113,7 @@ async def validate_remediation_snapshot(
     db: DbDep,
 ) -> RemediationResponse:
     """Queue or execute isolated snapshot validation for an approved remediation proposal."""
-    remediation, _finding, _project = await get_remediation_and_check_ownership(
+    remediation = await run_remediation_snapshot_validation(
         db=db,
         remediation_id=remediation_id,
         user_id=current_user.id,

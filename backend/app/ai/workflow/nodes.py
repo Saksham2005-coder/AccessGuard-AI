@@ -392,10 +392,16 @@ async def snapshot_validation_node(
     proposal = state.get("remediation_proposal") or {}
     patch_ops = proposal.get("patch_operations", [])
 
+    finding = state.get("finding") or {}
+    original_rule_id = str(finding.get("axe_rule_id") or "unknown-rule")
+    html_snippet = str(finding.get("html_snippet") or "<div></div>")
+
     if validator is not None:
         val_result = await validator.validate_snapshot(
-            finding_id=state.get("finding_id"),
+            snapshot_html=html_snippet,
+            original_rule_id=original_rule_id,
             patch_operations=patch_ops,
+            finding_id=state.get("finding_id"),
         )
         passed = bool(val_result.get("passed", False))
         next_status = "validated" if passed else "validation_failed"
