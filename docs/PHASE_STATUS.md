@@ -10,7 +10,7 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 |:---:|---|:---:|---|---|
 | **1** | Repository foundation and engineering conventions | Completed | 39ebd44, dcad099 | Monorepo structure, Python 3.12 (uv), React 19 + TS, Tailwind 4, axe-core bundle |
 | **2** | Backend core, configuration and API foundation | Completed | e75e1c7, adb8470 | Pydantic Settings, request ID context, structured logging, error handling, health probes |
-| **3** | PostgreSQL, SQLAlchemy, Alembic and authentication | Pending | - | Models, async sessions, Argon2, JWT auth |
+| **3** | PostgreSQL, SQLAlchemy, Alembic and authentication | Completed | cde91e7, f83f029 | User & RefreshSession models, Alembic migrations, Argon2 hashing, JWT & session rotation |
 | **4** | Projects, domain ownership and project authorization | Pending | - | Projects, DNS TXT verification, tenant isolation |
 | **5** | Scanner target policy and crawler foundation | Pending | - | SSRF guards, Playwright crawler, boundary tests |
 | **6** | axe-core integration and finding persistence | Pending | - | Local axe bundle injection, finding models, deduplication |
@@ -41,9 +41,9 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 - [x] Commit 6 (86db14c): `tests: cover API startup configuration and health routes`
 
 ### Phase 3 — PostgreSQL, SQLAlchemy, Alembic and authentication
-- [ ] Commit 7: `database: add SQLAlchemy models and migration foundation`
-- [ ] Commit 8: `auth: implement account registration and session lifecycle`
-- [ ] Commit 9: `tests: verify authentication and database isolation`
+- [x] Commit 7 (cde91e7): `database: add SQLAlchemy models and migration foundation`
+- [x] Commit 8 (f83f029): `auth: implement account registration and session lifecycle`
+- [x] Commit 9 (7188511): `tests: verify authentication and database isolation`
 
 ### Phase 4 — Projects, domain ownership and project authorization
 - [ ] Commit 10: `projects: add project persistence and ownership rules`
