@@ -1,5 +1,4 @@
-"""Database models package."""
-
+from app.db.models.agent_run import AgentRun
 from app.db.models.domain_verification import ProjectDomainVerification
 from app.db.models.finding import Finding, FindingNode
 from app.db.models.knowledge import KnowledgeChunk, KnowledgeSource
@@ -11,6 +10,7 @@ from app.db.models.scan_page import ScanPage
 from app.db.models.user import User
 
 __all__ = [
+    "AgentRun",
     "Finding",
     "FindingNode",
     "KnowledgeChunk",
