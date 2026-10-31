@@ -10,6 +10,8 @@ from app.ai.workflow.nodes import (
     finding_analysis_node,
     knowledge_retrieval_node,
     mark_manual_review_node,
+    remediation_proposal_node,
+    review_node,
     scan_context_node,
 )
 from app.ai.workflow.state import AccessGuardGraphState
@@ -35,11 +37,32 @@ def route_after_knowledge_retrieval(
 
 def route_after_finding_analysis(
     state: AccessGuardGraphState,
-) -> Literal["mark_manual_review", "finalize"]:
-    """Route to manual review if analysis requires human verification; else finalize."""
+) -> Literal["mark_manual_review", "remediation_proposal"]:
+    """Route to manual review if analysis requires human verification; else generate remediation."""
     if state.get("status") == "manual_review_required":
         return "mark_manual_review"
-    return "finalize"
+    return "remediation_proposal"
+
+
+def route_after_remediation_proposal(
+    state: AccessGuardGraphState,
+) -> Literal["mark_manual_review", "review"]:
+    """Route to manual review if proposal failed; else proceed to deterministic review."""
+    if state.get("status") == "manual_review_required":
+        return "mark_manual_review"
+    return "review"
+
+
+def route_after_review(
+    state: AccessGuardGraphState,
+) -> Literal["finalize", "remediation_proposal", "mark_manual_review"]:
+    """Route to finalize on approval, retry remediation once on failure, or escalate to manual review."""
+    if state.get("status") == "review_passed":
+        return "finalize"
+    # Allow at most 1 regeneration attempt (initial attempt = 1, retry = 2)
+    if state.get("attempt_count", 0) <= 1:
+        return "remediation_proposal"
+    return "mark_manual_review"
 
 
 def build_remediation_graph(
@@ -64,6 +87,12 @@ def build_remediation_graph(
         return await finding_analysis_node(state, provider=provider)
 
     workflow.add_node("finding_analysis", _analysis_step)
+
+    async def _remediation_step(state: AccessGuardGraphState) -> dict[str, Any]:
+        return await remediation_proposal_node(state, provider=provider)
+
+    workflow.add_node("remediation_proposal", _remediation_step)
+    workflow.add_node("review", review_node)
     workflow.add_node("mark_manual_review", mark_manual_review_node)
     workflow.add_node("finalize", finalize_node)
 
@@ -93,7 +122,26 @@ def build_remediation_graph(
         route_after_finding_analysis,
         {
             "mark_manual_review": "mark_manual_review",
+            "remediation_proposal": "remediation_proposal",
+        },
+    )
+
+    workflow.add_conditional_edges(
+        "remediation_proposal",
+        route_after_remediation_proposal,
+        {
+            "mark_manual_review": "mark_manual_review",
+            "review": "review",
+        },
+    )
+
+    workflow.add_conditional_edges(
+        "review",
+        route_after_review,
+        {
             "finalize": "finalize",
+            "remediation_proposal": "remediation_proposal",
+            "mark_manual_review": "mark_manual_review",
         },
     )
 

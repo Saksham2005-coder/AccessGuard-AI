@@ -65,9 +65,10 @@ async def test_graph_executes_investigation_with_sufficient_evidence(
 
     result = await graph.ainvoke(sample_finding_state)
 
-    assert result["status"] == "analysis_completed"
+    assert result["status"] == "review_passed"
     assert result["evidence_sufficient"] is True
     assert result["analysis"] is not None
+    assert result["remediation_proposal"] is not None
     assert "image-alt" in result["analysis"]["summary"].lower()
     assert "1.1.1" in result["analysis"]["relevant_criterion_ids"]
     assert result["metadata"]["analysis_provider"] == "mock"

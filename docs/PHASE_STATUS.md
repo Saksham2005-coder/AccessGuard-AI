@@ -83,8 +83,8 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 - [x] Commit 30 (9b45f74): `Validate structured outputs retries and secret handling`
 
 ### Phase 11 — LangGraph analysis and remediation proposal workflow
-- [x] Commit 31: `Build typed LangGraph investigation workflow`
-- [ ] Commit 32: `Generate evidence-grounded remediation proposals`
+- [x] Commit 31 (369c453): `Build typed LangGraph investigation workflow`
+- [x] Commit 32: `Generate evidence-grounded remediation proposals`
 - [ ] Commit 33: `Cover routing grounding and prompt-injection scenarios`
 
 ### Phase 12 — Human approval, safe patch policy and snapshot validation
