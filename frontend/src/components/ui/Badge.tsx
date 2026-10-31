@@ -7,16 +7,16 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-slate-100 text-slate-800 border border-slate-200",
-        primary: "bg-[#4657D8]/10 text-[#4657D8] border border-[#4657D8]/20",
-        secondary: "bg-slate-100 text-slate-700 border border-slate-200",
-        success: "bg-emerald-50 text-emerald-700 border border-emerald-200",
-        warning: "bg-amber-50 text-amber-700 border border-amber-200",
-        critical: "bg-red-50 text-red-700 border border-red-200",
-        serious: "bg-orange-50 text-orange-700 border border-orange-200",
-        moderate: "bg-amber-50 text-amber-700 border border-amber-200",
-        minor: "bg-sky-50 text-sky-700 border border-sky-200",
-        outline: "border border-slate-300 text-slate-700",
+        default: "bg-[#252C35] text-[#9CA3AF] border border-[#303741]",
+        primary: "bg-[#38BDF8]/15 text-[#38BDF8] border border-[#38BDF8]/30 font-semibold",
+        secondary: "bg-[#252C35] text-[#F3F4F6] border border-[#303741]",
+        success: "bg-emerald-500/15 text-[#34D399] border border-emerald-500/30 font-medium",
+        warning: "bg-amber-500/15 text-[#FBBF24] border border-amber-500/30 font-medium",
+        critical: "bg-rose-500/15 text-[#FB7185] border border-rose-500/30 font-semibold",
+        serious: "bg-orange-500/15 text-orange-400 border border-orange-500/30 font-semibold",
+        moderate: "bg-amber-500/15 text-[#FBBF24] border border-amber-500/30 font-medium",
+        minor: "bg-sky-500/15 text-[#38BDF8] border border-sky-500/30 font-medium",
+        outline: "border border-[#303741] text-[#9CA3AF]",
       },
     },
     defaultVariants: {

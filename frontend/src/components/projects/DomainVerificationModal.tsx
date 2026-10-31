@@ -114,150 +114,140 @@ export function DomainVerificationModal({
       isOpen={isOpen}
       onClose={onClose}
       title={`Domain Verification: ${project.base_domain}`}
-      description="Ownership verification ensures scans only target web infrastructure you control."
+      description="To prevent unauthorized scanning and SSRF abuse, domain ownership must be proven via DNS TXT record."
       className="max-w-xl"
     >
-      <div className="space-y-5 pt-2">
-        {/* Status Banner */}
-        <div className="flex items-center justify-between p-3.5 rounded-lg border border-slate-200 bg-slate-50">
+      <div className="space-y-4 pt-2">
+        {/* Verification Status Header Banner */}
+        <div className="flex items-center justify-between p-3.5 rounded-xl border border-[#303741] bg-[#171C23]">
           <div className="flex items-center gap-2.5">
             {isVerified ? (
-              <ShieldCheck className="h-5 w-5 text-emerald-600" />
+              <ShieldCheck className="h-5 w-5 text-[#34D399]" />
             ) : (
-              <Clock className="h-5 w-5 text-amber-600" />
+              <Clock className="h-5 w-5 text-[#FBBF24]" />
             )}
             <div>
-              <p className="text-xs font-semibold text-slate-800">
-                {isVerified ? "Ownership Verified" : "Verification Pending"}
-              </p>
-              <p className="text-[11px] text-slate-500">
+              <div className="text-xs font-semibold text-[#F3F4F6]">
+                {isVerified ? "Domain Ownership Verified" : "Awaiting DNS Propagation"}
+              </div>
+              <div className="text-[11px] text-[#9CA3AF]">
                 {isVerified
-                  ? "This domain is authorized for automated crawling and accessibility audits."
-                  : "Add the DNS TXT record below to your DNS management console."}
-              </p>
+                  ? `Verified at ${new Date(verification?.verified_at || project.updated_at).toLocaleDateString()}`
+                  : "Create the DNS TXT record below to authorize scans"}
+              </div>
             </div>
           </div>
-          <Badge variant={isVerified ? "success" : "warning"}>
-            {isVerified ? "Verified" : "Pending DNS"}
+          <Badge variant={isVerified ? "success" : "warning"} className="capitalize">
+            {verification?.status || "pending"}
           </Badge>
         </div>
 
+        {/* Error or Alert Message */}
         {actionError && (
           <div
             role="alert"
-            className="flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-800"
+            className="flex items-start gap-2.5 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-[#FB7185]"
           >
-            <ShieldAlert className="h-4 w-4 shrink-0 text-red-600 mt-0.5" />
+            <ShieldAlert className="h-4 w-4 shrink-0 mt-0.5" />
             <span>{actionError}</span>
           </div>
         )}
 
-        {checkResult && (
-          <div
-            role="status"
-            className={`flex items-start gap-2.5 rounded-lg border p-3 text-xs ${
-              checkResult.verified
-                ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-                : "border-amber-200 bg-amber-50 text-amber-800"
-            }`}
-          >
-            {checkResult.verified ? (
-              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" />
-            ) : (
-              <Clock className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" />
-            )}
-            <span>{checkResult.message}</span>
+        {/* Verification Success Feedback */}
+        {checkResult && checkResult.verified && (
+          <div className="flex items-start gap-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-[#34D399]">
+            <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" />
+            <span>{checkResult.message || "Domain verified successfully! You may now launch accessibility scans."}</span>
           </div>
         )}
 
-        {/* DNS Configuration Instructions */}
+        {/* DNS Challenge Instructions */}
         {verification && (
-          <div className="space-y-3">
-            <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
-              DNS TXT Record Details
-            </h3>
+          <div className="space-y-3 rounded-xl border border-[#303741] bg-[#171C23] p-4 text-xs">
+            <h4 className="font-semibold text-[#F3F4F6] text-xs uppercase tracking-wider">
+              Required DNS TXT Record
+            </h4>
 
             {/* Record Type */}
-            <div className="grid grid-cols-3 gap-2 text-xs">
-              <div className="col-span-1 rounded-md border border-slate-200 bg-slate-50 p-2.5">
-                <span className="block text-slate-400 font-medium mb-0.5">Record Type</span>
-                <span className="font-mono font-semibold text-slate-800">
-                  {verification.record_type || "TXT"}
-                </span>
-              </div>
-              <div className="col-span-2 rounded-md border border-slate-200 bg-slate-50 p-2.5">
-                <span className="block text-slate-400 font-medium mb-0.5">Target Host / Name</span>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-mono text-[11px] text-slate-800 break-all select-all">
-                    {verification.record_name}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => handleCopy("name", verification.record_name)}
-                    className="p-1 text-slate-400 hover:text-slate-700"
-                    title="Copy record host"
-                    aria-label="Copy record host"
-                  >
-                    {copiedField === "name" ? (
-                      <Check className="h-3.5 w-3.5 text-emerald-600" />
-                    ) : (
-                      <Copy className="h-3.5 w-3.5" />
-                    )}
-                  </button>
-                </div>
+            <div>
+              <span className="text-[11px] font-medium text-[#9CA3AF]">Record Type:</span>
+              <div className="mt-1 font-mono font-semibold text-[#38BDF8] bg-[#111315] border border-[#303741] px-2.5 py-1.5 rounded-lg">
+                TXT
               </div>
             </div>
 
-            {/* Record Value */}
-            <div className="rounded-md border border-slate-200 bg-slate-50 p-2.5 text-xs">
-              <span className="block text-slate-400 font-medium mb-0.5">Expected TXT Value</span>
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-mono text-[11px] text-slate-800 break-all select-all">
-                  {verification.expected_value}
-                </span>
+            {/* Host / Name */}
+            <div>
+              <div className="flex items-center justify-between text-[11px] text-[#9CA3AF]">
+                <span>Host / Name:</span>
                 <button
                   type="button"
-                  onClick={() => handleCopy("value", verification.expected_value)}
-                  className="p-1 text-slate-400 hover:text-slate-700"
-                  title="Copy expected value"
-                  aria-label="Copy expected value"
+                  onClick={() => handleCopy("name", verification.record_name)}
+                  className="text-[#38BDF8] hover:text-[#0EA5E9] inline-flex items-center gap-1 font-medium transition-colors"
                 >
-                  {copiedField === "value" ? (
-                    <Check className="h-3.5 w-3.5 text-emerald-600" />
-                  ) : (
-                    <Copy className="h-3.5 w-3.5" />
-                  )}
+                  {copiedField === "name" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                  <span>{copiedField === "name" ? "Copied" : "Copy Name"}</span>
                 </button>
               </div>
+              <div className="mt-1 font-mono text-xs text-[#F3F4F6] bg-[#111315] border border-[#303741] px-2.5 py-1.5 rounded-lg break-all">
+                {verification.record_name}
+              </div>
+            </div>
+
+            {/* Value / Content */}
+            <div>
+              <div className="flex items-center justify-between text-[11px] text-[#9CA3AF]">
+                <span>Value / Content:</span>
+                <button
+                  type="button"
+                  onClick={() => handleCopy("val", verification.expected_value)}
+                  className="text-[#38BDF8] hover:text-[#0EA5E9] inline-flex items-center gap-1 font-medium transition-colors"
+                  aria-label="Copy DNS Token"
+                >
+                  {copiedField === "val" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                  <span>{copiedField === "val" ? "Copied Token" : "Copy DNS Token"}</span>
+                </button>
+              </div>
+              <div className="mt-1 font-mono text-xs text-[#F3F4F6] bg-[#111315] border border-[#303741] px-2.5 py-1.5 rounded-lg break-all">
+                {verification.expected_value}
+              </div>
+            </div>
+
+            <div className="text-[11px] text-[#6B7280] pt-1">
+              DNS propagation typically takes 1 to 5 minutes depending on your DNS host TTL settings.
             </div>
           </div>
         )}
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-slate-100">
+        {/* Action Controls */}
+        <div className="flex items-center justify-between pt-3 border-t border-[#303741]">
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
+            size="sm"
             onClick={handleRefreshToken}
-            disabled={isRefreshing || isChecking}
-            className="text-xs text-slate-500 hover:text-slate-700 gap-1.5"
+            isLoading={isRefreshing}
+            disabled={isVerified}
+            className="text-xs gap-1.5"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
-            Regenerate Challenge
+            <RefreshCw className="h-3.5 w-3.5" />
+            <span>Generate New Token</span>
           </Button>
 
           <div className="flex items-center gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" size="sm" onClick={onClose} className="text-xs">
               Close
             </Button>
             {!isVerified && (
               <Button
                 type="button"
+                size="sm"
                 onClick={handleVerifyNow}
-                disabled={isChecking || isRefreshing}
-                className="gap-1.5"
+                isLoading={isChecking}
+                className="text-xs gap-1.5 font-semibold"
               >
-                <CheckCircle2 className={`h-4 w-4 ${isChecking ? "animate-spin" : ""}`} />
-                {isChecking ? "Checking DNS..." : "Verify DNS Now"}
+                <ShieldCheck className="h-3.5 w-3.5" />
+                <span>Verify DNS Now</span>
               </Button>
             )}
           </div>

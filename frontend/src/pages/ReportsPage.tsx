@@ -4,10 +4,10 @@ import {
   Download,
   FileText,
   Printer,
-  ShieldCheck,
+  Shield,
 } from "lucide-react";
 import { Button } from "../components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/Card";
+import { Card, CardContent } from "../components/ui/Card";
 import { Badge } from "../components/ui/Badge";
 import { EmptyState } from "../components/ui/EmptyState";
 import { listProjectsApi } from "../api/projects";
@@ -86,22 +86,22 @@ export function ReportsPage() {
   };
 
   if (projectsLoading) {
-    return <div className="p-8 text-center text-sm text-slate-500">Loading reports...</div>;
+    return <div className="p-8 text-center text-sm text-[#9CA3AF]">Loading compliance reports...</div>;
   }
 
   if (projects.length === 0) {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Audit Reports</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-2xl font-bold tracking-tight text-[#F3F4F6]">Audit Reports</h1>
+          <p className="text-sm text-[#9CA3AF] mt-1">
             Export structured JSON datasets and shareable accessibility audit reports.
           </p>
         </div>
         <EmptyState
           icon={FileText}
-          title="No projects configured"
-          description="Create a project and execute accessibility scans to generate audit reports."
+          title="No Projects Available for Reporting"
+          description="Create a monitored project and run an audit scan to generate executive accessibility reports."
         />
       </div>
     );
@@ -109,139 +109,160 @@ export function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header and Project Filter */}
+      {/* Header & Export Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Audit Reports</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-2xl font-bold tracking-tight text-[#F3F4F6]">
+            Audit Reports
+          </h1>
+          <p className="text-sm text-[#9CA3AF] mt-1">
             Export structured JSON datasets and shareable accessibility audit reports.
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-3">
           <select
             value={activeProjectId}
             onChange={(e) => setSelectedProjectId(e.target.value)}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 focus:border-[#4657D8] focus:outline-none"
-            aria-label="Select report project"
+            className="h-9 rounded-lg border border-[#303741] bg-[#171C23] px-3 text-xs font-medium text-[#F3F4F6] focus:border-[#38BDF8] focus:outline-none focus:ring-2 focus:ring-[#38BDF8]/20 transition-colors cursor-pointer"
+            aria-label="Filter report by project"
           >
             {projects.map((p) => (
-              <option key={p.id} value={p.id}>
+              <option key={p.id} value={p.id} className="bg-[#1D2229]">
                 {p.name} ({p.base_domain})
               </option>
             ))}
           </select>
 
-          <Button variant="outline" size="sm" onClick={handlePrint} className="gap-1.5 text-xs">
-            <Printer className="h-4 w-4" />
-            <span className="hidden sm:inline">Print Report</span>
+          <Button variant="outline" size="sm" onClick={handleDownloadJson} className="gap-1.5 text-xs">
+            <Download className="h-3.5 w-3.5 text-[#38BDF8]" />
+            <span>Download JSON</span>
           </Button>
 
-          <Button size="sm" onClick={handleDownloadJson} className="gap-1.5 text-xs">
-            <Download className="h-4 w-4" />
-            <span>Export JSON</span>
+          <Button size="sm" onClick={handlePrint} className="gap-1.5 text-xs font-semibold">
+            <Printer className="h-3.5 w-3.5" />
+            <span>Print Report</span>
           </Button>
         </div>
       </div>
 
-      {/* Main Executive Summary Card */}
-      <Card className="border-slate-200">
-        <CardHeader className="border-b border-slate-100 pb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-lg font-bold">
-                {activeProject?.name} &mdash; Accessibility Status Report
-              </CardTitle>
-              <CardDescription className="text-xs font-mono text-slate-400 mt-0.5">
-                Target Domain: {activeProject?.base_domain} &bull; Generated: {new Date().toLocaleDateString()}
-              </CardDescription>
+      {/* Executive Health Score Banner */}
+      <Card className="overflow-hidden">
+        <div className="bg-gradient-to-r from-[#171A1F] to-[#1D2229] p-6 border-b border-[#303741]">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-[#38BDF8]">
+                  Automated Audit Health Score
+                </span>
+                <Badge variant="outline" className="text-[10px] font-mono border-[#38BDF8]/30 text-[#38BDF8]">
+                  axe-core 4.14.0
+                </Badge>
+              </div>
+              <h2 className="text-xl font-bold text-[#F3F4F6]">
+                {activeProject?.name} ({activeProject?.base_domain})
+              </h2>
+              <p className="text-xs text-[#9CA3AF] max-w-xl leading-relaxed">
+                Aggregated automated score based on rule violations detected during continuous crawling. Note: Automated scans do not certify legal WCAG compliance.
+              </p>
             </div>
-            <Badge variant={healthScore >= 80 ? "success" : healthScore >= 50 ? "warning" : "critical"}>
-              Score: {healthScore} / 100
-            </Badge>
-          </div>
-        </CardHeader>
 
-        <CardContent className="pt-6 space-y-6">
-          {/* Summary KPIs */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 text-center">
-              <span className="text-2xl font-bold text-slate-900">{scans.length}</span>
-              <p className="text-xs text-slate-500 mt-1">Scans Executed</p>
-            </div>
-            <div className="p-4 rounded-lg bg-red-50/50 border border-red-200 text-center">
-              <span className="text-2xl font-bold text-red-600">{criticalCount}</span>
-              <p className="text-xs text-slate-500 mt-1">Critical Issues</p>
-            </div>
-            <div className="p-4 rounded-lg bg-amber-50/50 border border-amber-200 text-center">
-              <span className="text-2xl font-bold text-amber-600">{seriousCount}</span>
-              <p className="text-xs text-slate-500 mt-1">Serious Issues</p>
-            </div>
-            <div className="p-4 rounded-lg bg-blue-50/50 border border-blue-200 text-center">
-              <span className="text-2xl font-bold text-blue-600">{moderateCount + minorCount}</span>
-              <p className="text-xs text-slate-500 mt-1">Moderate/Minor</p>
+            <div className="flex items-center gap-4 bg-[#111315] border border-[#303741] rounded-2xl p-4 shrink-0">
+              <div className="text-right">
+                <div className="text-xs text-[#9CA3AF] font-medium">Health Score</div>
+                <div className="text-xs text-[#6B7280]">Out of 100 max</div>
+              </div>
+              <div className="text-3xl font-extrabold font-mono text-[#38BDF8]">
+                {healthScore}
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Standard Evaluation Breakdown */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
-              WCAG Principles Evaluation
-            </h3>
-
-            <div className="rounded-lg border border-slate-200 overflow-hidden text-xs">
-              <table className="w-full text-left">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold text-[11px] uppercase">
-                  <tr>
-                    <th className="px-4 py-2.5">Principle</th>
-                    <th className="px-4 py-2.5">Coverage Focus</th>
-                    <th className="px-4 py-2.5">Violations Found</th>
-                    <th className="px-4 py-2.5 text-right">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  <tr>
-                    <td className="px-4 py-3 font-semibold text-slate-800">1. Perceivable</td>
-                    <td className="px-4 py-3 text-slate-500">Text alternatives, color contrast, headings, landmarks</td>
-                    <td className="px-4 py-3 font-mono font-medium">{findings.filter((f) => f.axe_rule_id.includes("color") || f.axe_rule_id.includes("alt") || f.axe_rule_id.includes("heading")).length}</td>
-                    <td className="px-4 py-3 text-right"><Badge variant="outline">Evaluated</Badge></td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-3 font-semibold text-slate-800">2. Operable</td>
-                    <td className="px-4 py-3 text-slate-500">Keyboard navigation, button names, link purposes</td>
-                    <td className="px-4 py-3 font-mono font-medium">{findings.filter((f) => f.axe_rule_id.includes("button") || f.axe_rule_id.includes("link") || f.axe_rule_id.includes("tab")).length}</td>
-                    <td className="px-4 py-3 text-right"><Badge variant="outline">Evaluated</Badge></td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-3 font-semibold text-slate-800">3. Understandable</td>
-                    <td className="px-4 py-3 text-slate-500">Page language, form labels, input error announcements</td>
-                    <td className="px-4 py-3 font-mono font-medium">{findings.filter((f) => f.axe_rule_id.includes("label") || f.axe_rule_id.includes("lang") || f.axe_rule_id.includes("html-has-lang")).length}</td>
-                    <td className="px-4 py-3 text-right"><Badge variant="outline">Evaluated</Badge></td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-3 font-semibold text-slate-800">4. Robust</td>
-                    <td className="px-4 py-3 text-slate-500">ARIA valid attribute names, roles, allowed children</td>
-                    <td className="px-4 py-3 font-mono font-medium">{findings.filter((f) => f.axe_rule_id.includes("aria")).length}</td>
-                    <td className="px-4 py-3 text-right"><Badge variant="outline">Evaluated</Badge></td>
-                  </tr>
-                </tbody>
-              </table>
+        <CardContent className="p-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <div className="rounded-xl border border-[#303741] bg-[#171C23] p-3.5">
+              <div className="text-xs font-medium text-[#FB7185]">Critical Issues</div>
+              <div className="text-2xl font-bold font-mono text-[#FB7185] mt-1">{criticalCount}</div>
             </div>
-          </div>
-
-          {/* Compliance Statement */}
-          <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/75 text-xs text-slate-600 space-y-1.5">
-            <div className="flex items-center gap-1.5 font-semibold text-slate-800">
-              <ShieldCheck className="h-4 w-4 text-[#4657D8]" />
-              <span>Observability Methodology & Evaluation Scope</span>
+            <div className="rounded-xl border border-[#303741] bg-[#171C23] p-3.5">
+              <div className="text-xs font-medium text-orange-400">Serious Violations</div>
+              <div className="text-2xl font-bold font-mono text-orange-400 mt-1">{seriousCount}</div>
             </div>
-            <p>
-              Audits are conducted via headless Playwright Chromium running pinned axe-core 4.14.0 rulesets.
-              Automated tests reliably catch approximately 57% of WCAG success criteria failures. All proposed AI code remediations require human reviewer approval and are verified against isolated DOM snapshots prior to production deployment.
-            </p>
+            <div className="rounded-xl border border-[#303741] bg-[#171C23] p-3.5">
+              <div className="text-xs font-medium text-[#FBBF24]">Moderate Violations</div>
+              <div className="text-2xl font-bold font-mono text-[#FBBF24] mt-1">{moderateCount}</div>
+            </div>
+            <div className="rounded-xl border border-[#303741] bg-[#171C23] p-3.5">
+              <div className="text-xs font-medium text-[#38BDF8]">Minor Violations</div>
+              <div className="text-2xl font-bold font-mono text-[#38BDF8] mt-1">{minorCount}</div>
+            </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* WCAG Principles (POUR) Grid */}
+      <div className="space-y-3">
+        <h3 className="text-base font-semibold text-[#F3F4F6]">
+          WCAG 2.2 Principles Breakdown
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+          <Card className="p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-[#F3F4F6]">1. Perceivable</span>
+              <Badge variant="outline" className="text-[10px]">Info & UI</Badge>
+            </div>
+            <p className="text-[11px] text-[#9CA3AF] leading-relaxed">
+              Text alternatives, time-based media, adaptable structure, and distinguishable contrast.
+            </p>
+          </Card>
+
+          <Card className="p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-[#F3F4F6]">2. Operable</span>
+              <Badge variant="outline" className="text-[10px]">Navigation</Badge>
+            </div>
+            <p className="text-[11px] text-[#9CA3AF] leading-relaxed">
+              Keyboard accessible, enough time, seizures prevention, navigability, and input modalities.
+            </p>
+          </Card>
+
+          <Card className="p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-[#F3F4F6]">3. Understandable</span>
+              <Badge variant="outline" className="text-[10px]">Clarity</Badge>
+            </div>
+            <p className="text-[11px] text-[#9CA3AF] leading-relaxed">
+              Readable text language, predictable web pages, and automated input assistance.
+            </p>
+          </Card>
+
+          <Card className="p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-[#F3F4F6]">4. Robust</span>
+              <Badge variant="outline" className="text-[10px]">Compatibility</Badge>
+            </div>
+            <p className="text-[11px] text-[#9CA3AF] leading-relaxed">
+              Compatible with current and future user agents, including assistive technologies.
+            </p>
+          </Card>
+        </div>
+      </div>
+
+      {/* Observability Boundary Disclaimer */}
+      <div className="rounded-xl border border-[#303741] bg-[#171A1F] p-4 text-xs">
+        <div className="flex items-start gap-3">
+          <Shield className="h-5 w-5 text-[#38BDF8] shrink-0 mt-0.5" />
+          <div>
+            <span className="font-semibold text-[#F3F4F6] uppercase tracking-wider text-[11px]">
+              Compliance Notice
+            </span>
+            <p className="text-[#9CA3AF] mt-0.5 leading-relaxed">
+              Automated scans cover objective criteria (contrast, alt attributes, ARIA roles, form labels). True accessibility conformance requires expert manual verification, screen reader testing (NVDA, VoiceOver), and assistive technology assessments.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

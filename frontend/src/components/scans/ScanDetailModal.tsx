@@ -1,13 +1,9 @@
 import { useEffect, useState } from "react";
 import {
-  Activity,
   AlertCircle,
   AlertTriangle,
   Ban,
   CheckCircle2,
-  Clock,
-  ExternalLink,
-  Shield,
 } from "lucide-react";
 import { Dialog } from "../ui/Dialog";
 import { Button } from "../ui/Button";
@@ -30,8 +26,6 @@ export function ScanDetailModal({
   const [scan, setScan] = useState<Scan | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
-
-  const isLoading = !scan || scan.id !== scanId;
 
   // Poll for scan status while active
   useEffect(() => {
@@ -114,7 +108,7 @@ export function ScanDetailModal({
       ) {
         setActionError(err.response.data.detail);
       } else {
-        setActionError("Failed to cancel scan.");
+        setActionError("Failed to cancel scan execution.");
       }
     } finally {
       setIsCancelling(false);
@@ -125,158 +119,123 @@ export function ScanDetailModal({
     <Dialog
       isOpen={isOpen}
       onClose={onClose}
-      title="Accessibility Scan Execution"
-      description="Multi-page Playwright crawling and axe-core accessibility audit status."
-      className="max-w-xl"
+      title="Audit Execution Telemetry"
+      description={`Real-time Playwright execution logs and axe-core audit results for ${scan?.target_url || ""}`}
+      className="max-w-2xl"
     >
-      <div className="space-y-5 pt-2">
-        {isLoading && !scan ? (
-          <div className="py-8 text-center text-sm text-slate-500">
-            Loading scan telemetry...
+      <div className="space-y-4 pt-2">
+        {/* Error Alert */}
+        {actionError && (
+          <div
+            role="alert"
+            className="flex items-start gap-2.5 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-[#FB7185]"
+          >
+            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+            <span>{actionError}</span>
           </div>
-        ) : scan ? (
-          <>
-            {/* Target URL Header */}
-            <div className="flex items-center justify-between p-3.5 rounded-lg border border-slate-200 bg-slate-50">
-              <div className="space-y-0.5 max-w-[70%]">
-                <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
-                  Target Endpoint
-                </span>
-                <a
-                  href={scan.target_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-1.5 text-xs font-mono font-medium text-[#4657D8] hover:underline truncate"
-                >
-                  <span className="truncate">{scan.target_url}</span>
-                  <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-                </a>
-              </div>
-              <Badge
-                variant={
-                  isActive
-                    ? "default"
-                    : isCompleted
-                      ? "success"
-                      : "critical"
-                }
-                className="capitalize shrink-0 gap-1.5"
-              >
-                {isActive && <Activity className="h-3 w-3 animate-spin" />}
-                {isCompleted && <CheckCircle2 className="h-3 w-3" />}
-                {isFailed && <AlertCircle className="h-3 w-3" />}
-                <span>{scan.status.replace("_", " ")}</span>
-              </Badge>
-            </div>
+        )}
 
-            {actionError && (
-              <div
-                role="alert"
-                className="flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-800"
-              >
-                <AlertCircle className="h-4 w-4 shrink-0 text-red-600 mt-0.5" />
-                <span>{actionError}</span>
-              </div>
+        {/* Status & Engine Header */}
+        <div className="flex items-center justify-between p-3.5 rounded-xl border border-[#303741] bg-[#171C23]">
+          <div className="flex items-center gap-2.5">
+            {isActive ? (
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#38BDF8] opacity-75" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-[#38BDF8]" />
+              </span>
+            ) : isCompleted ? (
+              <CheckCircle2 className="h-5 w-5 text-[#34D399]" />
+            ) : (
+              <AlertTriangle className="h-5 w-5 text-[#FB7185]" />
             )}
-
-            {/* Progress Bar */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-xs font-medium text-slate-700">
-                <span>Crawl Progress</span>
-                <span>{isActive ? `${progressPercent}%` : isCompleted ? "100%" : "Terminated"}</span>
-              </div>
-              <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
-                <div
-                  className={`h-full transition-all duration-300 ${
-                    isActive
-                      ? "bg-[#4657D8] animate-pulse"
-                      : isCompleted
-                        ? "bg-emerald-600"
-                        : "bg-red-500"
-                  }`}
-                  style={{ width: `${isCompleted ? 100 : progressPercent}%` }}
-                />
+            <div>
+              <span className="text-xs font-semibold text-[#F3F4F6] capitalize">
+                Status: {scan?.status || "Loading..."}
+              </span>
+              <div className="text-[11px] text-[#9CA3AF]">
+                axe-core {scan?.axe_version || "4.14.0"} • {scan?.browser_version || "Chromium"}
               </div>
             </div>
+          </div>
 
-            {/* Telemetry Metrics Grid */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="p-3 rounded-lg border border-slate-200 bg-white text-center">
-                <div className="text-xl font-bold text-slate-900">
-                  {processedPages}
-                  <span className="text-xs font-normal text-slate-400">/{maxPages}</span>
-                </div>
-                <p className="text-[11px] text-slate-500 mt-0.5">Pages Crawled</p>
-              </div>
+          <Badge
+            variant={isCompleted ? "success" : isFailed ? "critical" : "primary"}
+            className="capitalize"
+          >
+            {scan?.status || "pending"}
+          </Badge>
+        </div>
 
-              <div className="p-3 rounded-lg border border-slate-200 bg-white text-center">
-                <div
-                  className={`text-xl font-bold ${
-                    scan.total_violations > 0 ? "text-red-600" : "text-emerald-600"
-                  }`}
-                >
-                  {scan.total_violations}
-                </div>
-                <p className="text-[11px] text-slate-500 mt-0.5">Violations Found</p>
-              </div>
+        {/* Progress Bar */}
+        <div className="space-y-1.5 rounded-xl border border-[#303741] bg-[#171C23] p-4">
+          <div className="flex justify-between text-xs font-semibold">
+            <span className="text-[#9CA3AF] uppercase tracking-wider text-[11px]">Crawl Progress</span>
+            <span className="text-[#38BDF8] font-mono">{progressPercent}%</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-[#111315] border border-[#303741]">
+            <div
+              className="h-full bg-gradient-to-r from-[#38BDF8] to-[#0EA5E9] transition-all duration-300"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-[11px] text-[#9CA3AF] pt-1">
+            <span>Pages: {processedPages} of {maxPages} max</span>
+            <span>Violations: <strong className="text-[#FB7185] font-mono">{scan?.total_violations || 0}</strong></span>
+          </div>
+        </div>
 
-              <div className="p-3 rounded-lg border border-slate-200 bg-white text-center">
-                <div className="text-xl font-bold text-slate-900 font-mono text-sm pt-0.5">
-                  {scan.axe_version || "4.14.0"}
-                </div>
-                <p className="text-[11px] text-slate-500 mt-0.5">axe-core Version</p>
-              </div>
+        {/* Telemetry Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <div className="rounded-xl border border-[#303741] bg-[#171C23] p-3 text-center">
+            <div className="text-[#9CA3AF] text-[11px]">Pages Crawled</div>
+            <div className="text-lg font-bold font-mono text-[#34D399] mt-0.5">
+              {scan?.pages_succeeded || 0}
             </div>
-
-            {/* Error Summary if failed */}
-            {scan.error_summary && (
-              <div className="p-3 rounded-lg border border-red-200 bg-red-50 text-xs text-red-800 space-y-1">
-                <p className="font-semibold flex items-center gap-1.5">
-                  <AlertTriangle className="h-4 w-4 text-red-600" />
-                  <span>Execution Notice</span>
-                </p>
-                <p className="font-mono text-[11px]">{scan.error_summary}</p>
-              </div>
-            )}
-
-            {/* Audit Details */}
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600 space-y-1">
-              <div className="flex items-center gap-2 text-slate-700">
-                <Shield className="h-4 w-4 text-[#4657D8]" />
-                <span className="font-medium">Rule Engine: WCAG 2.1 & 2.2 Level A/AA</span>
-              </div>
-              <div className="flex items-center gap-2 text-slate-500">
-                <Clock className="h-4 w-4" />
-                <span>
-                  Started: {scan.started_at ? new Date(scan.started_at).toLocaleTimeString() : "Pending start"}
-                </span>
-              </div>
+          </div>
+          <div className="rounded-xl border border-[#303741] bg-[#171C23] p-3 text-center">
+            <div className="text-[#9CA3AF] text-[11px]">axe-core Version</div>
+            <div className="text-lg font-bold font-mono text-[#F3F4F6] mt-0.5">
+              {scan?.axe_version || "4.14.0"}
             </div>
-
-            {/* Footer Actions */}
-            <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-              {isActive ? (
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  onClick={handleCancel}
-                  disabled={isCancelling}
-                  className="gap-1.5 text-xs"
-                >
-                  <Ban className="h-3.5 w-3.5" />
-                  <span>{isCancelling ? "Cancelling..." : "Cancel Scan"}</span>
-                </Button>
-              ) : (
-                <div />
-              )}
-
-              <Button type="button" variant="outline" onClick={onClose}>
-                Close
-              </Button>
+          </div>
+          <div className="rounded-xl border border-[#303741] bg-[#171C23] p-3 text-center">
+            <div className="text-[#9CA3AF] text-[11px]">Max Depth</div>
+            <div className="text-lg font-bold font-mono text-[#F3F4F6] mt-0.5">
+              {String(scan?.config?.max_depth ?? 2)}
             </div>
-          </>
-        ) : null}
+          </div>
+          <div className="rounded-xl border border-[#303741] bg-[#171C23] p-3 text-center">
+            <div className="text-[#9CA3AF] text-[11px]">Violations Found</div>
+            <div className="text-lg font-bold font-mono text-[#FB7185] mt-0.5">
+              {scan?.total_violations || 0}
+            </div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center justify-between pt-3 border-t border-[#303741]">
+          {isActive ? (
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              onClick={handleCancel}
+              isLoading={isCancelling}
+              className="text-xs gap-1.5"
+            >
+              <Ban className="h-3.5 w-3.5" />
+              <span>Cancel Scan</span>
+            </Button>
+          ) : (
+            <div className="text-xs text-[#9CA3AF] font-mono">
+              Completed at: {scan?.completed_at ? new Date(scan.completed_at).toLocaleTimeString() : "N/A"}
+            </div>
+          )}
+
+          <Button type="button" variant="outline" size="sm" onClick={onClose} className="text-xs">
+            Close
+          </Button>
+        </div>
       </div>
     </Dialog>
   );

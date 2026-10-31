@@ -18,10 +18,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-slate-700 select-none"
+            className="block text-xs font-semibold text-[#F3F4F6] uppercase tracking-wider select-none"
           >
             {label}
-            {props.required && <span className="text-red-500 ml-1" aria-hidden="true">*</span>}
+            {props.required && <span className="text-[#FB7185] ml-1" aria-hidden="true">*</span>}
           </label>
         )}
         <input
@@ -29,12 +29,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           type={type}
           ref={ref}
           className={cn(
-            "flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-900 shadow-2xs transition-colors",
-            "file:border-0 file:bg-transparent file:text-sm file:font-medium",
-            "placeholder:text-slate-400",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4657D8] focus-visible:border-transparent",
-            "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-slate-50",
-            error && "border-red-500 focus-visible:ring-red-500",
+            "flex h-9 w-full rounded-lg border border-[#303741] bg-[#171C23] px-3 py-1.5 text-sm text-[#F3F4F6] placeholder:text-[#6B7280] shadow-xs transition-colors",
+            "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-[#F3F4F6]",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] focus-visible:border-transparent",
+            "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-[#111315]",
+            error && "border-[#FB7185] focus-visible:ring-[#FB7185]",
             className
           )}
           aria-invalid={error ? "true" : undefined}
@@ -46,12 +45,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {helperText && !error && (
-          <p id={helperId} className="text-xs text-slate-500">
+          <p id={helperId} className="text-xs text-[#9CA3AF]">
             {helperText}
           </p>
         )}
         {error && (
-          <p id={errorId} className="text-xs text-red-600 font-medium" role="alert">
+          <p id={errorId} className="text-xs text-[#FB7185] font-medium" role="alert">
             {error}
           </p>
         )}

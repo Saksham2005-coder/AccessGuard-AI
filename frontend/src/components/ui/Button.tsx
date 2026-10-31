@@ -4,22 +4,29 @@ import { Loader2 } from "lucide-react";
 import { cn } from "../../lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4657D8] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none cursor-pointer",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] focus-visible:ring-offset-2 focus-visible:ring-offset-[#111315] disabled:pointer-events-none disabled:opacity-50 select-none cursor-pointer",
   {
     variants: {
       variant: {
-        default: "bg-[#4657D8] text-white hover:bg-[#3746B8] shadow-xs",
-        secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200 border border-slate-200",
-        outline: "border border-slate-200 bg-white text-slate-800 hover:bg-slate-50 hover:border-slate-300 shadow-2xs",
-        ghost: "text-slate-700 hover:bg-slate-100 hover:text-slate-900",
-        destructive: "bg-red-600 text-white hover:bg-red-700 shadow-xs focus-visible:ring-red-500",
-        link: "text-[#4657D8] underline-offset-4 hover:underline p-0 h-auto",
-        success: "bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs",
+        default:
+          "bg-[#38BDF8] text-[#111315] font-semibold hover:bg-[#0EA5E9] shadow-sm shadow-[#38BDF8]/10 active:scale-[0.98]",
+        secondary:
+          "bg-[#252C35] text-[#F3F4F6] hover:bg-[#303741] border border-[#303741] hover:border-[#38BDF8]/30",
+        outline:
+          "border border-[#303741] bg-[#171C23]/60 text-[#F3F4F6] hover:bg-[#1D2229] hover:border-[#38BDF8]/40 hover:text-[#38BDF8]",
+        ghost:
+          "text-[#9CA3AF] hover:bg-[#252C35] hover:text-[#F3F4F6]",
+        destructive:
+          "bg-rose-500/15 text-[#FB7185] hover:bg-rose-500/25 border border-rose-500/30 focus-visible:ring-rose-500",
+        link:
+          "text-[#38BDF8] underline-offset-4 hover:underline p-0 h-auto hover:text-[#0EA5E9]",
+        success:
+          "bg-emerald-500/15 text-[#34D399] hover:bg-emerald-500/25 border border-emerald-500/30",
       },
       size: {
         sm: "h-8 px-3 text-xs rounded-md",
         md: "h-9 px-4 py-2",
-        lg: "h-10 px-5 text-base rounded-md",
+        lg: "h-10 px-5 text-base rounded-lg",
         icon: "h-9 w-9",
       },
     },

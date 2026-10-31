@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { AlertCircle, Globe, Link as LinkIcon, Play, ShieldAlert } from "lucide-react";
+import { AlertCircle, Link as LinkIcon, Play, ShieldAlert } from "lucide-react";
 import { Dialog } from "../ui/Dialog";
 import { Button } from "../ui/Button";
 import { Project } from "../../api/projects";
@@ -114,7 +114,7 @@ export function CreateScanModal({
       ) {
         setServerError(err.response.data.detail);
       } else {
-        setServerError("Failed to initiate scan. Ensure the target domain is verified.");
+        setServerError("Failed to launch scan. Please verify target domain ownership.");
       }
     }
   };
@@ -123,17 +123,16 @@ export function CreateScanModal({
     <Dialog
       isOpen={isOpen}
       onClose={handleClose}
-      title="Initiate Accessibility Scan"
-      description="Launch an automated multi-page Playwright crawler with pinned axe-core 4.14.0 evaluation."
-      className="max-w-lg"
+      title="Configure Accessibility Scan"
+      description="Launch Playwright Chromium with pinned axe-core 4.14.0 across verified web pages."
     >
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4 pt-2">
         {serverError && (
           <div
             role="alert"
-            className="flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-800"
+            className="flex items-start gap-2.5 rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-[#FB7185]"
           >
-            <AlertCircle className="h-4 w-4 shrink-0 text-red-600 mt-0.5" />
+            <AlertCircle className="h-4 w-4 shrink-0 text-[#FB7185] mt-0.5" />
             <span>{serverError}</span>
           </div>
         )}
@@ -142,74 +141,77 @@ export function CreateScanModal({
         <div>
           <label
             htmlFor="scan-project"
-            className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5"
+            className="block text-xs font-semibold text-[#F3F4F6] uppercase tracking-wider mb-1.5"
           >
-            Monitored Project
+            Target Project
           </label>
-          <div className="relative">
-            <Globe className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-            <select
-              id="scan-project"
-              {...register("project_id")}
-              onChange={handleProjectChange}
-              className="w-full rounded-lg border border-slate-300 bg-white pl-9 pr-8 py-2 text-sm text-slate-900 focus:border-[#4657D8] focus:outline-none focus:ring-2 focus:ring-[#4657D8]/20 transition-colors"
-            >
-              {projects.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} ({p.base_domain})
-                </option>
-              ))}
-            </select>
-          </div>
-          {errors.project_id && (
-            <p className="mt-1 text-xs text-red-600">{errors.project_id.message}</p>
-          )}
-
-          {selectedProject && !isDomainVerified && (
-            <div className="mt-2 flex items-center gap-2 p-2.5 rounded-md border border-amber-200 bg-amber-50 text-xs text-amber-800">
-              <ShieldAlert className="h-4 w-4 shrink-0 text-amber-600" />
-              <span>
-                Domain <strong>{selectedProject.base_domain}</strong> is not verified. Complete DNS TXT verification before running scans.
-              </span>
-            </div>
-          )}
+          <select
+            id="scan-project"
+            value={selectedProjectId}
+            onChange={handleProjectChange}
+            className="flex h-10 w-full rounded-lg border border-[#303741] bg-[#171C23] px-3 text-sm text-[#F3F4F6] shadow-xs focus:outline-none focus:ring-2 focus:ring-[#38BDF8] focus:border-transparent transition-colors cursor-pointer"
+          >
+            {projects.map((p) => (
+              <option key={p.id} value={p.id} className="bg-[#1D2229] text-[#F3F4F6]">
+                {p.name} ({p.base_domain})
+              </option>
+            ))}
+          </select>
         </div>
+
+        {/* Domain Verification Warning Banner */}
+        {selectedProject && !isDomainVerified && (
+          <div
+            role="alert"
+            className="flex items-start gap-2.5 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-[#FBBF24]"
+          >
+            <ShieldAlert className="h-4 w-4 shrink-0 text-[#FBBF24] mt-0.5" />
+            <div>
+              <span className="font-semibold">Domain Ownership Unverified:</span>
+              <p className="mt-0.5 text-[11px] text-[#9CA3AF]">
+                Complete DNS TXT verification before running scans on <code className="text-[#F3F4F6] font-mono">{selectedProject.base_domain}</code>.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Target URL */}
         <div>
           <label
             htmlFor="target-url"
-            className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5"
+            className="block text-xs font-semibold text-[#F3F4F6] uppercase tracking-wider mb-1.5"
           >
-            Target Entrypoint URL
+            Target URL
           </label>
           <div className="relative">
-            <LinkIcon className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <LinkIcon className="absolute left-3 top-2.5 h-4 w-4 text-[#6B7280]" />
             <input
               id="target-url"
               type="url"
               placeholder="https://example.com"
+              {...register("target_url")}
+              className={`flex h-10 w-full rounded-lg border bg-[#171C23] pl-9 pr-3 text-sm text-[#F3F4F6] placeholder:text-[#6B7280] shadow-xs focus:outline-none focus:ring-2 focus:ring-[#38BDF8] focus:border-transparent transition-colors font-mono ${
+                errors.target_url ? "border-[#FB7185]" : "border-[#303741]"
+              }`}
               aria-invalid={Boolean(errors.target_url)}
               aria-describedby={errors.target_url ? "target-url-error" : undefined}
-              {...register("target_url")}
-              className="w-full rounded-lg border border-slate-300 bg-white pl-9 pr-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#4657D8] focus:outline-none focus:ring-2 focus:ring-[#4657D8]/20 transition-colors"
             />
           </div>
           {errors.target_url && (
-            <p id="target-url-error" className="mt-1 text-xs text-red-600">
+            <p id="target-url-error" className="mt-1 text-xs text-[#FB7185]" role="alert">
               {errors.target_url.message}
             </p>
           )}
         </div>
 
-        {/* Crawl Parameters Grid */}
+        {/* Crawl Bounds Grid */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label
               htmlFor="max-pages"
-              className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5"
+              className="block text-xs font-semibold text-[#F3F4F6] uppercase tracking-wider mb-1.5"
             >
-              Max Pages
+              Max Pages (1–100)
             </label>
             <input
               id="max-pages"
@@ -217,19 +219,23 @@ export function CreateScanModal({
               min={1}
               max={100}
               {...register("max_pages", { valueAsNumber: true })}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-[#4657D8] focus:outline-none focus:ring-2 focus:ring-[#4657D8]/20 transition-colors"
+              className={`flex h-10 w-full rounded-lg border bg-[#171C23] px-3 text-sm text-[#F3F4F6] shadow-xs focus:outline-none focus:ring-2 focus:ring-[#38BDF8] focus:border-transparent font-mono transition-colors ${
+                errors.max_pages ? "border-[#FB7185]" : "border-[#303741]"
+              }`}
             />
             {errors.max_pages && (
-              <p className="mt-1 text-xs text-red-600">{errors.max_pages.message}</p>
+              <p className="mt-1 text-xs text-[#FB7185]" role="alert">
+                {errors.max_pages.message}
+              </p>
             )}
           </div>
 
           <div>
             <label
               htmlFor="max-depth"
-              className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5"
+              className="block text-xs font-semibold text-[#F3F4F6] uppercase tracking-wider mb-1.5"
             >
-              Max Depth
+              Max Depth (0–5)
             </label>
             <input
               id="max-depth"
@@ -237,31 +243,30 @@ export function CreateScanModal({
               min={0}
               max={5}
               {...register("max_depth", { valueAsNumber: true })}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-[#4657D8] focus:outline-none focus:ring-2 focus:ring-[#4657D8]/20 transition-colors"
+              className={`flex h-10 w-full rounded-lg border bg-[#171C23] px-3 text-sm text-[#F3F4F6] shadow-xs focus:outline-none focus:ring-2 focus:ring-[#38BDF8] focus:border-transparent font-mono transition-colors ${
+                errors.max_depth ? "border-[#FB7185]" : "border-[#303741]"
+              }`}
             />
             {errors.max_depth && (
-              <p className="mt-1 text-xs text-red-600">{errors.max_depth.message}</p>
+              <p className="mt-1 text-xs text-[#FB7185]" role="alert">
+                {errors.max_depth.message}
+              </p>
             )}
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleClose}
-            disabled={isSubmitting}
-          >
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#303741]">
+          <Button type="button" variant="outline" onClick={handleClose}>
             Cancel
           </Button>
           <Button
             type="submit"
-            disabled={isSubmitting || !isDomainVerified}
-            className="gap-2"
+            isLoading={isSubmitting}
+            disabled={!isDomainVerified}
+            className="gap-2 font-semibold"
           >
-            <Play className="h-4 w-4" />
-            <span>{isSubmitting ? "Launching..." : "Start Scan"}</span>
+            <Play className="h-4 w-4 fill-current" />
+            <span>Start Scan</span>
           </Button>
         </div>
       </form>

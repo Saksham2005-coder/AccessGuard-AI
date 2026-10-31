@@ -41,7 +41,7 @@ export function Dialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#111315]/80 backdrop-blur-xs animate-in fade-in duration-150"
       role="dialog"
       aria-modal="true"
       aria-labelledby="dialog-title"
@@ -55,17 +55,17 @@ export function Dialog({
       <div
         ref={dialogRef}
         className={cn(
-          "relative z-10 w-full max-w-lg rounded-xl border border-slate-200 bg-white p-6 shadow-xl animate-in zoom-in-95 duration-150",
+          "relative z-10 w-full max-w-lg rounded-2xl border border-[#303741] bg-[#1D2229] p-6 shadow-2xl text-[#F3F4F6] animate-in zoom-in-95 duration-150",
           className
         )}
       >
-        <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-100">
+        <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#303741]">
           <div>
-            <h2 id="dialog-title" className="text-lg font-semibold text-slate-900">
+            <h2 id="dialog-title" className="text-lg font-semibold text-[#F3F4F6]">
               {title}
             </h2>
             {description && (
-              <p id="dialog-description" className="text-sm text-slate-500 mt-1">
+              <p id="dialog-description" className="text-sm text-[#9CA3AF] mt-1">
                 {description}
               </p>
             )}
@@ -73,7 +73,7 @@ export function Dialog({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4657D8]"
+            className="rounded-lg p-1.5 text-[#9CA3AF] hover:bg-[#252C35] hover:text-[#F3F4F6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] transition-colors"
             aria-label="Close dialog"
           >
             <X className="h-5 w-5" aria-hidden="true" />

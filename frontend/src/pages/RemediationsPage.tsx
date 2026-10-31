@@ -2,13 +2,12 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangle,
-  ArrowRight,
   CheckCircle2,
   Clock,
   Code,
   FileCheck2,
-  RefreshCw,
-  ShieldCheck,
+  Play,
+  Shield,
   Sparkles,
   ThumbsDown,
   ThumbsUp,
@@ -102,56 +101,96 @@ export function RemediationsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "validated":
-        return <Badge variant="success" className="gap-1"><CheckCircle2 className="h-3 w-3" /> Validated</Badge>;
+        return (
+          <Badge variant="success" className="gap-1.5 font-semibold">
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            <span>Validated</span>
+          </Badge>
+        );
       case "approved":
-        return <Badge variant="primary" className="gap-1"><ShieldCheck className="h-3 w-3" /> Approved</Badge>;
+        return (
+          <Badge variant="primary" className="gap-1.5 font-semibold">
+            <ThumbsUp className="h-3.5 w-3.5" />
+            <span>Approved</span>
+          </Badge>
+        );
       case "rejected":
-        return <Badge variant="critical" className="gap-1"><XCircle className="h-3 w-3" /> Rejected</Badge>;
+        return (
+          <Badge variant="critical" className="gap-1.5 font-semibold">
+            <XCircle className="h-3.5 w-3.5" />
+            <span>Rejected</span>
+          </Badge>
+        );
       case "validation_failed":
-        return <Badge variant="critical" className="gap-1"><AlertTriangle className="h-3 w-3" /> Validation Failed</Badge>;
+        return (
+          <Badge variant="critical" className="gap-1.5 font-semibold">
+            <AlertTriangle className="h-3.5 w-3.5" />
+            <span>Validation Failed</span>
+          </Badge>
+        );
       default:
-        return <Badge variant="warning" className="gap-1"><Clock className="h-3 w-3" /> Pending Review</Badge>;
+        return (
+          <Badge variant="warning" className="gap-1.5 font-semibold">
+            <Clock className="h-3.5 w-3.5" />
+            <span>Pending Review</span>
+          </Badge>
+        );
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-[#F3F4F6]">
             AI Remediation Review
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Review evidence-grounded code proposals, approve safe patches, and verify snapshot tests.
+          <p className="text-sm text-[#9CA3AF] mt-1">
+            Evidence-grounded code proposals, human-in-the-loop review, and isolated snapshot validation.
           </p>
         </div>
 
-        {/* Status Filter */}
-        <div className="flex items-center gap-2">
+        {/* Filter Dropdown */}
+        <div className="flex items-center gap-2.5">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 focus:border-[#4657D8] focus:outline-none focus:ring-2 focus:ring-[#4657D8]/20"
-            aria-label="Filter proposals by status"
+            className="h-9 rounded-lg border border-[#303741] bg-[#171C23] px-3 text-xs font-medium text-[#F3F4F6] focus:border-[#38BDF8] focus:outline-none focus:ring-2 focus:ring-[#38BDF8]/20 transition-colors cursor-pointer"
+            aria-label="Filter remediations by status"
           >
-            <option value="">All Proposals</option>
-            <option value="pending_approval">Pending Review</option>
-            <option value="approved">Approved</option>
-            <option value="validated">Validated</option>
-            <option value="rejected">Rejected</option>
+            <option value="" className="bg-[#1D2229]">All Proposals</option>
+            <option value="pending_approval" className="bg-[#1D2229]">Pending Review</option>
+            <option value="approved" className="bg-[#1D2229]">Approved</option>
+            <option value="validated" className="bg-[#1D2229]">Snapshot Validated</option>
+            <option value="rejected" className="bg-[#1D2229]">Rejected</option>
           </select>
         </div>
       </div>
 
-      {/* Loading Skeleton */}
+      {/* Observability Boundary Banner */}
+      <div className="rounded-xl border border-[#303741] bg-[#171A1F] p-4 text-xs">
+        <div className="flex items-start gap-3">
+          <Shield className="h-5 w-5 text-[#38BDF8] shrink-0 mt-0.5" />
+          <div>
+            <span className="font-semibold text-[#F3F4F6] uppercase tracking-wider text-[11px]">
+              Human-in-the-Loop Safe Patch Policy
+            </span>
+            <p className="text-[#9CA3AF] mt-0.5 leading-relaxed">
+              AI remediations are immutable suggestions requiring engineer review. Once approved, the patch is reconstructed and re-tested in an isolated headless Chromium sandbox with network egress aborted before code incorporation.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Loading Skeletons */}
       {isLoading && (
-        <div className="space-y-4">
+        <div className="space-y-4" aria-busy="true">
           {[1, 2].map((i) => (
             <Card key={i} className="p-6 space-y-4">
-              <Skeleton className="h-5 w-1/3" />
+              <Skeleton className="h-6 w-1/3" />
               <Skeleton className="h-4 w-2/3" />
-              <div className="grid grid-cols-2 gap-4 pt-3">
+              <div className="grid grid-cols-2 gap-4 pt-2">
                 <Skeleton className="h-28 w-full" />
                 <Skeleton className="h-28 w-full" />
               </div>
@@ -160,163 +199,114 @@ export function RemediationsPage() {
         </div>
       )}
 
-      {/* Error Banner */}
-      {isError && (
-        <Card className="border-red-200 bg-red-50 p-6 text-center text-red-800 text-sm">
-          Failed to load remediation proposals. Please ensure your session is active.
-        </Card>
-      )}
-
       {/* Empty State */}
       {!isLoading && !isError && remediations.length === 0 && (
         <EmptyState
           icon={Sparkles}
-          title={statusFilter ? "No matching proposals" : "No remediation proposals yet"}
-          description={
-            statusFilter
-              ? "No proposals match the selected status filter."
-              : "Generate an AI proposal from any accessibility finding to preview safe patches and isolated snapshot validation."
-          }
+          title="No Remediation Proposals"
+          description="Navigate to Findings and select 'Generate AI Remediation' on any detected accessibility barrier to initiate LangGraph analysis."
         />
       )}
 
-      {/* Remediation Cards */}
+      {/* Remediations List */}
       {!isLoading && !isError && remediations.length > 0 && (
         <div className="space-y-6">
           {remediations.map((r) => {
             const isPending = r.status === "pending_approval";
+            const isApproved = r.status === "approved";
             const latestValidation = r.validation_results?.[r.validation_results.length - 1];
 
             return (
-              <Card key={r.id} className="border-slate-200 shadow-xs overflow-hidden">
+              <Card
+                key={r.id}
+                className="hover:border-[#38BDF8]/40 transition-all overflow-hidden"
+              >
                 <CardContent className="p-6 space-y-5">
-                  {/* Proposal Header */}
-                  <div className="flex flex-wrap items-start justify-between gap-3 pb-4 border-b border-slate-100">
-                    <div className="space-y-1">
+                  {/* Top Bar: Root Cause & Status */}
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div className="space-y-1 max-w-2xl">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-slate-900 text-sm">
-                          Remediation Proposal
+                        <span className="text-xs font-semibold uppercase tracking-wider text-[#38BDF8]">
+                          Root Cause Analysis
                         </span>
-                        {getStatusBadge(r.status)}
+                        <span>•</span>
+                        <span className="text-xs text-[#9CA3AF] font-mono">
+                          Format: {r.patch_format}
+                        </span>
                       </div>
-                      <p className="text-xs text-slate-500">
-                        Model: <span className="font-mono">{r.model_provider || "AI Provider"}: {r.model_name || "default"}</span>
-                        {r.confidence && (
-                          <span className="ml-3 font-medium text-indigo-600">
-                            {Math.round(r.confidence * 100)}% Confidence
-                          </span>
-                        )}
+                      <h3 className="text-base font-semibold text-[#F3F4F6] leading-snug">
+                        {r.root_cause}
+                      </h3>
+                      <p className="text-xs text-[#9CA3AF] leading-relaxed">
+                        {r.recommendation}
                       </p>
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex items-center gap-2">
-                      {isPending && (
-                        <>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleOpenAction(r, "reject")}
-                            className="gap-1.5 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <ThumbsDown className="h-3.5 w-3.5" />
-                            <span>Reject</span>
-                          </Button>
-                          <Button
-                            variant="default"
-                            size="sm"
-                            onClick={() => handleOpenAction(r, "approve")}
-                            className="gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
-                          >
-                            <ThumbsUp className="h-3.5 w-3.5" />
-                            <span>Approve Patch</span>
-                          </Button>
-                        </>
-                      )}
-
-                      {r.status === "approved" && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => validateMutation.mutate(r.id)}
-                          disabled={validateMutation.isPending}
-                          className="gap-1.5 text-xs"
-                        >
-                          <RefreshCw
-                            className={`h-3.5 w-3.5 ${validateMutation.isPending ? "animate-spin" : ""}`}
-                          />
-                          <span>Validate Snapshot</span>
-                        </Button>
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                      {getStatusBadge(r.status)}
+                      {r.confidence && (
+                        <Badge variant="outline" className="text-xs font-mono text-[#38BDF8] border-[#38BDF8]/30">
+                          {Math.round(r.confidence * 100)}% Confidence
+                        </Badge>
                       )}
                     </div>
                   </div>
 
-                  {/* Root Cause & Recommendation */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                    <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50 space-y-1">
-                      <span className="font-semibold text-slate-700 uppercase tracking-wider text-[11px]">
-                        Likely Root Cause
+                  {/* Split-Panel Code Review Diff View */}
+                  <div className="rounded-xl border border-[#303741] overflow-hidden bg-[#111315]">
+                    <div className="bg-[#171A1F] px-4 py-2 border-b border-[#303741] flex items-center justify-between text-xs font-semibold text-[#9CA3AF]">
+                      <div className="flex items-center gap-2">
+                        <Code className="h-3.5 w-3.5 text-[#38BDF8]" />
+                        <span className="text-[#F3F4F6]">DOM Patch Comparison</span>
+                      </div>
+                      <span className="text-[11px] font-mono text-[#6B7280]">
+                        Model: {r.model_provider || "AI"} ({r.model_name || "llm"})
                       </span>
-                      <p className="text-slate-600 leading-relaxed">{r.root_cause}</p>
                     </div>
 
-                    <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50 space-y-1">
-                      <span className="font-semibold text-slate-700 uppercase tracking-wider text-[11px]">
-                        Engineering Recommendation
-                      </span>
-                      <p className="text-slate-600 leading-relaxed">{r.recommendation}</p>
-                    </div>
-                  </div>
-
-                  {/* Before / After Diff Viewer */}
-                  <div className="space-y-2">
-                    <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                      <Code className="h-3.5 w-3.5 text-slate-400" />
-                      <span>Proposed DOM Patch Comparison</span>
-                    </span>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                      {/* Before Snippet */}
-                      <div className="rounded-lg border border-red-200 overflow-hidden bg-slate-900">
-                        <div className="bg-red-950/60 px-3 py-1.5 border-b border-red-900/50 text-[11px] font-medium text-red-300 flex items-center justify-between">
-                          <span>Original Failing Snippet</span>
-                          <span className="text-[10px] uppercase font-mono text-red-400">Before</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#303741]">
+                      {/* Left Side: Before Snippet (Original Violation) */}
+                      <div className="p-4 bg-rose-950/10">
+                        <div className="flex items-center justify-between pb-2 mb-2 border-b border-rose-900/30 text-xs">
+                          <span className="font-semibold text-[#FB7185] flex items-center gap-1.5">
+                            <span className="h-1.5 w-1.5 rounded-full bg-[#FB7185]" />
+                            <span>Original Element (Violating)</span>
+                          </span>
                         </div>
-                        <pre className="p-3 font-mono text-xs text-red-300 overflow-x-auto whitespace-pre-wrap break-all">
-                          {r.before_snippet || "No before snippet provided"}
+                        <pre className="text-xs font-mono text-rose-300 overflow-x-auto whitespace-pre-wrap break-all select-all">
+                          {r.before_snippet || "No before snippet available"}
                         </pre>
                       </div>
 
-                      {/* After Snippet */}
-                      <div className="rounded-lg border border-emerald-200 overflow-hidden bg-slate-900">
-                        <div className="bg-emerald-950/60 px-3 py-1.5 border-b border-emerald-900/50 text-[11px] font-medium text-emerald-300 flex items-center justify-between">
-                          <span className="flex items-center gap-1">
-                            <span>Remediated Safe Patch</span>
-                            <ArrowRight className="h-3 w-3" />
+                      {/* Right Side: After Snippet (Proposed Safe Fix) */}
+                      <div className="p-4 bg-emerald-950/10">
+                        <div className="flex items-center justify-between pb-2 mb-2 border-b border-emerald-900/30 text-xs">
+                          <span className="font-semibold text-[#34D399] flex items-center gap-1.5">
+                            <span className="h-1.5 w-1.5 rounded-full bg-[#34D399]" />
+                            <span>Proposed Patch (Compliant)</span>
                           </span>
-                          <span className="text-[10px] uppercase font-mono text-emerald-400">After</span>
                         </div>
-                        <pre className="p-3 font-mono text-xs text-emerald-300 overflow-x-auto whitespace-pre-wrap break-all">
+                        <pre className="text-xs font-mono text-emerald-300 overflow-x-auto whitespace-pre-wrap break-all select-all">
                           {r.after_snippet || "No after snippet provided"}
                         </pre>
                       </div>
                     </div>
                   </div>
 
-                  {/* Validation Results Audit */}
+                  {/* Validation Results Audit Banner */}
                   {latestValidation && (
                     <div
-                      className={`p-3.5 rounded-lg border text-xs flex items-center justify-between ${
+                      className={`p-3.5 rounded-xl border text-xs flex items-center justify-between ${
                         latestValidation.passed
-                          ? "border-emerald-200 bg-emerald-50 text-emerald-900"
-                          : "border-red-200 bg-red-50 text-red-900"
+                          ? "border-emerald-500/30 bg-emerald-500/10 text-[#34D399]"
+                          : "border-rose-500/30 bg-rose-500/10 text-[#FB7185]"
                       }`}
                     >
                       <div className="flex items-center gap-2">
                         {latestValidation.passed ? (
-                          <FileCheck2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                          <FileCheck2 className="h-4 w-4 text-[#34D399] shrink-0" />
                         ) : (
-                          <AlertTriangle className="h-4 w-4 text-red-600 shrink-0" />
+                          <AlertTriangle className="h-4 w-4 text-[#FB7185] shrink-0" />
                         )}
                         <span>
                           Isolated snapshot test:{" "}
@@ -327,31 +317,78 @@ export function RemediationsPage() {
                           </strong>
                         </span>
                       </div>
-                      <span className="text-[11px] text-slate-500 font-mono">
+                      <span className="text-[11px] text-[#9CA3AF] font-mono">
                         {new Date(latestValidation.created_at).toLocaleTimeString()}
                       </span>
                     </div>
                   )}
 
                   {/* Human Approvals Audit Log */}
-                  {r.approvals?.length > 0 && (
-                    <div className="pt-2 text-xs text-slate-500 border-t border-slate-100 flex items-center justify-between">
+                  {r.approvals && r.approvals.length > 0 && (
+                    <div className="pt-2 text-xs text-[#9CA3AF] border-t border-[#303741] flex items-center justify-between">
                       <span>
                         Reviewed by tenant:{" "}
-                        <strong className="capitalize text-slate-700">
+                        <strong className="capitalize text-[#F3F4F6]">
                           {r.approvals[r.approvals.length - 1].decision}
                         </strong>
                         {r.approvals[r.approvals.length - 1].comments && (
-                          <span className="italic ml-2 text-slate-600">
+                          <span className="italic ml-2 text-[#9CA3AF]">
                             &ldquo;{r.approvals[r.approvals.length - 1].comments}&rdquo;
                           </span>
                         )}
                       </span>
-                      <span>
+                      <span className="font-mono text-[11px]">
                         {new Date(r.approvals[r.approvals.length - 1].created_at).toLocaleDateString()}
                       </span>
                     </div>
                   )}
+
+                  {/* Actions Bar */}
+                  <div className="pt-3 border-t border-[#303741] flex items-center justify-between gap-3">
+                    <div className="text-[11px] text-[#6B7280]">
+                      Proposal ID: <span className="font-mono">{r.id.slice(0, 8)}...</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {/* If approved but not validated yet, allow triggering snapshot validation */}
+                      {isApproved && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => validateMutation.mutate(r.id)}
+                          isLoading={validateMutation.isPending}
+                          className="text-xs gap-1.5"
+                        >
+                          <Play className="h-3.5 w-3.5 text-[#38BDF8]" />
+                          <span>Validate Snapshot</span>
+                        </Button>
+                      )}
+
+                      {/* If pending review, allow Approve or Reject */}
+                      {isPending && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleOpenAction(r, "reject")}
+                            className="text-xs gap-1.5"
+                          >
+                            <ThumbsDown className="h-3.5 w-3.5" />
+                            <span>Reject</span>
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={() => handleOpenAction(r, "approve")}
+                            className="text-xs gap-1.5 font-semibold"
+                          >
+                            <ThumbsUp className="h-3.5 w-3.5" />
+                            <span>Approve Patch</span>
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             );
@@ -374,7 +411,7 @@ export function RemediationsPage() {
           <div>
             <label
               htmlFor="review-notes"
-              className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5"
+              className="block text-xs font-semibold text-[#F3F4F6] uppercase tracking-wider mb-1.5"
             >
               Reviewer Notes (Optional)
             </label>
@@ -383,12 +420,12 @@ export function RemediationsPage() {
               rows={3}
               value={comments}
               onChange={(e) => setComments(e.target.value)}
-              placeholder="Add rationale, context, or feedback for this patch..."
-              className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 focus:border-[#4657D8] focus:outline-none focus:ring-2 focus:ring-[#4657D8]/20 transition-colors"
+              placeholder="Optional review rationale or feedback..."
+              className="w-full rounded-lg border border-[#303741] bg-[#171C23] p-2.5 text-xs text-[#F3F4F6] placeholder:text-[#6B7280] focus:border-[#38BDF8] focus:outline-none focus:ring-2 focus:ring-[#38BDF8]/20 transition-colors"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#303741]">
             <Button variant="outline" onClick={handleCloseModal}>
               Cancel
             </Button>
@@ -396,7 +433,7 @@ export function RemediationsPage() {
               variant={actionType === "approve" ? "default" : "destructive"}
               onClick={handleConfirmDecision}
               disabled={approveMutation.isPending || rejectMutation.isPending}
-              className={actionType === "approve" ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""}
+              className={actionType === "approve" ? "font-semibold" : ""}
             >
               {actionType === "approve" ? "Confirm Approval" : "Confirm Rejection"}
             </Button>
