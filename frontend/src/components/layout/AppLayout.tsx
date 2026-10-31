@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   Activity,
@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { useAuthStore } from "../../store/authStore";
 
 export interface NavItem {
   title: string;
@@ -41,9 +42,13 @@ export interface AppLayoutProps {
   onLogout?: () => void;
 }
 
-export function AppLayout({ user, onLogout }: AppLayoutProps) {
+export function AppLayout({ user: userProp, onLogout: onLogoutProp }: AppLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const store = useAuthStore();
+
+  const user = userProp !== undefined ? userProp : store.user;
+  const onLogout = onLogoutProp !== undefined ? onLogoutProp : store.logout;
 
   const displayName = user?.display_name || user?.email?.split("@")[0] || "User";
   const userEmail = user?.email || "user@accessguard.ai";

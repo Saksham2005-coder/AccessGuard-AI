@@ -93,8 +93,8 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 - [x] Commit 36 (ed524b9): `Verify approval resume and remediation regression handling`
 
 ### Phase 13 — Frontend shell, authentication and design system
-- [x] Commit 37: `Establish AccessGuard design system and application shell`
-- [ ] Commit 38: `Implement authentication and protected navigation`
+- [x] Commit 37 (2c9b608): `Establish AccessGuard design system and application shell`
+- [x] Commit 38: `Implement authentication and protected navigation`
 - [ ] Commit 39: `Verify frontend auth responsive layout and accessibility baseline`
 
 ### Phase 14 — Projects, domain verification and scan management UI
@@ -120,6 +120,6 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 13 Commit 37 complete (`Establish AccessGuard design system and application shell`). Component design system (Button, Input, Card, Badge, Skeleton, Dialog, Table, EmptyState), responsive layout shell with desktop sidebar, mobile drawer, skip-to-content accessibility link, page shells, TanStack Query provider, and React Router navigation configured with clean ESLint and TypeScript build.
-- Next: Commit 38 (`Implement authentication and protected navigation`).
+- Current: Phase 13 Commit 38 complete (`Implement authentication and protected navigation`). Auth API client with memory token access and automatic 401 refresh queue, Zustand auth store with session persistence, ProtectedRoute with accessible session loading, full LoginPage and RegisterPage forms with Zod validation and ARIA announcements.
+- Next: Commit 39 (`Verify frontend auth responsive layout and accessibility baseline`).
 
