@@ -98,8 +98,8 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 - [x] Commit 39: `Verify frontend auth responsive layout and accessibility baseline`
 
 ### Phase 14 — Projects, domain verification and scan management UI
-- [x] Commit 40: `Implement project creation and domain verification screens`
-- [ ] Commit 41: `Add scan creation history and real-time progress`
+- [x] Commit 40 (f14cc2a): `Implement project creation and domain verification screens`
+- [x] Commit 41: `Add scan creation history and real-time progress`
 - [ ] Commit 42: `Cover project and scan journeys in browser`
 
 ### Phase 15 — Findings, AI remediation, reports and knowledge UI
@@ -120,8 +120,9 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 14 Commit 40 complete (`Implement project creation and domain verification screens`). Projects API client with domain normalization and error translation, CreateProjectModal dialog with Zod validation, DomainVerificationModal with DNS TXT record copyable targets, real-time DNS TXT check triggering, challenge token renewal, and responsive project management dashboard.
-- Next: Commit 41 (`Add scan creation history and real-time progress`).
+- Current: Phase 14 Commit 41 complete (`Add scan creation history and real-time progress`). Scans API layer with typed models, CreateScanModal with project selection, target URL normalization, crawl depth/pages limits and domain verification guard, ScanDetailModal with live progress telemetry, pages/violations metrics and cancellation capability, and responsive ScansPage with live polling.
+- Next: Commit 42 (`Cover project and scan journeys in browser`).
+
 
 
 
