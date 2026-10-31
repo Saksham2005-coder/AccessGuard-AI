@@ -12,7 +12,7 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 | **2** | Backend core, configuration and API foundation | Completed | e75e1c7, adb8470 | Pydantic Settings, request ID context, structured logging, error handling, health probes |
 | **3** | PostgreSQL, SQLAlchemy, Alembic and authentication | Completed | cde91e7, f83f029 | User & RefreshSession models, Alembic migrations, Argon2 hashing, JWT & session rotation |
 | **4** | Projects, domain ownership and project authorization | Completed | d771e3e, f1dcf8e | Projects, DNS TXT verification, tenant isolation |
-| **5** | Scanner target policy and crawler foundation | Pending | - | SSRF guards, Playwright crawler, boundary tests |
+| **5** | Scanner target policy and crawler foundation | Completed | 3d0babe, 40783a5 | SSRF guards, Playwright crawler, boundary tests |
 | **6** | axe-core integration and finding persistence | Pending | - | Local axe bundle injection, finding models, deduplication |
 | **7** | Celery background scans, progress events and cancellation | Pending | - | Celery + Redis orchestration, SSE event streams |
 | **8** | WCAG source ingestion and local embedding pipeline | Pending | - | W3C ingestion, MiniLM embeddings, Qdrant indexing |
@@ -48,12 +48,12 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ### Phase 4 — Projects, domain ownership and project authorization
 - [x] Commit 10 (d771e3e): `Add project management models and data persistence`
 - [x] Commit 11 (f1dcf8e): `Implement DNS domain verification service and API endpoints`
-- [x] Commit 12: `Verify project isolation and domain verification workflows`
+- [x] Commit 12 (58b5f76): `Verify project isolation and domain verification workflows`
 
 ### Phase 5 — Scanner target policy and crawler foundation
-- [ ] Commit 13: `scanner: implement URL normalization and target policy`
-- [ ] Commit 14: `scanner: add bounded Playwright crawler`
-- [ ] Commit 15: `security: cover SSRF redirect and crawl boundary cases`
+- [x] Commit 13 (3d0babe): `Implement URL normalization and scanner target policy`
+- [x] Commit 14 (40783a5): `Add bounded Playwright browser crawler`
+- [x] Commit 15: `Cover SSRF prevention redirect validation and crawl limits`
 
 ### Phase 6 — axe-core integration and finding persistence
 - [ ] Commit 16: `scanner: bundle axe-core and execute accessibility rules`
@@ -120,5 +120,5 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 4 complete with 59/59 passing tests, RFC domain normalization, tenant isolation, and DNS TXT verification.
-- Next: Phase 5 — Scanner target policy, SSRF pre-navigation guards, and bounded Playwright crawler.
+- Current: Phase 5 complete with 111/111 passing tests, SSRF guards, Playwright Chromium crawler, and network threat model documentation.
+- Next: Phase 6 — axe-core injection, finding normalization, deduplication, and persistence schema.
