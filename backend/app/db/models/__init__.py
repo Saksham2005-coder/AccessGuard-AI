@@ -5,6 +5,7 @@ from app.db.models.finding import Finding, FindingNode
 from app.db.models.project import Project
 from app.db.models.refresh_session import RefreshSession
 from app.db.models.scan import Scan
+from app.db.models.scan_event import ScanEvent
 from app.db.models.scan_page import ScanPage
 from app.db.models.user import User
 
@@ -15,6 +16,7 @@ __all__ = [
     "ProjectDomainVerification",
     "RefreshSession",
     "Scan",
+    "ScanEvent",
     "ScanPage",
     "User",
 ]
