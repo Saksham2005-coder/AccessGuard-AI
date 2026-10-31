@@ -82,10 +82,10 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 - [x] Commit 29 (8e8d0d8): `Integrate configured Gemini and Groq adapters`
 - [x] Commit 30 (9b45f74): `Validate structured outputs retries and secret handling`
 
-### Phase 11 — LangGraph analysis and remediation proposal workflow
+### Phase 11 — LangGraph analysis and remediation proposal workflow (COMPLETED)
 - [x] Commit 31 (369c453): `Build typed LangGraph investigation workflow`
-- [x] Commit 32: `Generate evidence-grounded remediation proposals`
-- [ ] Commit 33: `Cover routing grounding and prompt-injection scenarios`
+- [x] Commit 32 (00e0979): `Generate evidence-grounded remediation proposals`
+- [x] Commit 33 (adc8659): `Cover routing grounding and prompt-injection scenarios`
 
 ### Phase 12 — Human approval, safe patch policy and snapshot validation
 - [ ] Commit 34: `Add human approval and graph checkpoint persistence`
@@ -120,5 +120,5 @@ This document tracks implementation progress across all 17 phases defined in `Ac
 ---
 
 ## Known Issues and Next Steps
-- Current: Phase 10 complete with all 22 AI provider unit/integration tests passing (175/175 total backend tests passing). Google Gemini adapter integrated and verified with live Gemini API key, Groq adapter integrated, deterministic mock provider with simulated error injection, tenacity exponential retries for transient rate limits and server errors, and robust secret sanitization across all log streams.
-- Next: Phase 11 — LangGraph multi-agent analysis and remediation workflow (Commit 31: `Build typed LangGraph investigation workflow`).
+- Current: Phase 11 complete with all 36 AI and LangGraph workflow unit/integration tests passing (189/189 total backend tests passing). Multi-agent investigation workflow with typed StateGraph, grounded RAG evidence retrieval, prompt injection safe input structuring, evidence citation validation, safe DOM patch attribute policy verification, bounded 1-retry regeneration, and agent execution audit persistence.
+- Next: Phase 12 — Human approval, safe patch policy and snapshot validation (Commit 34: `Add human approval and graph checkpoint persistence`).
