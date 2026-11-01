@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import TIMESTAMP, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import TIMESTAMP, Float, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -57,6 +57,21 @@ class ScanPage(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
     screenshot_storage_key: Mapped[str | None] = mapped_column(
         Text,
+        nullable=True,
+    )
+    viewport_width: Mapped[int | None] = mapped_column(
+        Integer,
+        default=1280,
+        nullable=True,
+    )
+    viewport_height: Mapped[int | None] = mapped_column(
+        Integer,
+        default=800,
+        nullable=True,
+    )
+    device_pixel_ratio: Mapped[float | None] = mapped_column(
+        Float,
+        default=1.0,
         nullable=True,
     )
     dom_snapshot_storage_key: Mapped[str | None] = mapped_column(

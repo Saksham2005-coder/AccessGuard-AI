@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Activity,
@@ -19,6 +20,7 @@ import { CreateScanModal } from "../components/scans/CreateScanModal";
 import { ScanDetailModal } from "../components/scans/ScanDetailModal";
 
 export function ScansPage() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedScanId, setSelectedScanId] = useState<string | null>(null);
@@ -292,6 +294,9 @@ export function ScansPage() {
         }}
         onScanUpdated={() => {
           queryClient.invalidateQueries({ queryKey: ["scans", activeProjectId] });
+        }}
+        onInspectFinding={(findingId) => {
+          navigate(`/app/findings?finding_id=${findingId}`);
         }}
       />
     </div>

@@ -69,8 +69,13 @@ async def persist_page_audit_results(
     audit_status: str = "completed",
     error_code: str | None = None,
     error_summary: str | None = None,
+    screenshot_storage_key: str | None = None,
+    viewport_width: int | None = 1280,
+    viewport_height: int | None = 800,
+    device_pixel_ratio: float | None = 1.0,
+    element_geometries: dict[str, Any] | None = None,
 ) -> ScanPage:
-    """Persist a crawled page along with its normalized axe-core violations and incomplete findings."""
+    """Persist a crawled page along with its normalized axe-core violations, incomplete findings, and DOM geometry."""
     # Check duplicate normalized_url for this scan to enforce idempotency
     existing_page = await db.execute(
         select(ScanPage).where(
@@ -92,6 +97,10 @@ async def persist_page_audit_results(
         http_status=http_status,
         audit_status=audit_status,
         load_duration_ms=load_duration_ms,
+        screenshot_storage_key=screenshot_storage_key,
+        viewport_width=viewport_width,
+        viewport_height=viewport_height,
+        device_pixel_ratio=device_pixel_ratio,
         error_code=error_code,
         error_summary=error_summary,
         scanned_at=now,
@@ -108,7 +117,25 @@ async def persist_page_audit_results(
     for item in audit_result.incomplete:
         all_findings_to_store.append((item, True))
 
+    geoms = element_geometries or {}
+
     for finding_item, is_incomplete in all_findings_to_store:
+        primary_sel = finding_item.primary_selector
+        geom_info = geoms.get(primary_sel)
+        finding_bbox = None
+        finding_geom_status = "not_located"
+
+        if geom_info:
+            if hasattr(geom_info, "bounding_box") and geom_info.bounding_box:
+                finding_bbox = geom_info.bounding_box.model_dump()
+            elif isinstance(geom_info, dict) and geom_info.get("bounding_box"):
+                finding_bbox = geom_info["bounding_box"]
+
+            if hasattr(geom_info, "status"):
+                finding_geom_status = geom_info.status
+            elif isinstance(geom_info, dict):
+                finding_geom_status = geom_info.get("status", "not_located")
+
         finding = Finding(
             scan_page_id=scan_page.id,
             axe_rule_id=finding_item.rule_id,
@@ -117,9 +144,11 @@ async def persist_page_audit_results(
             help=finding_item.help_text,
             help_url=finding_item.help_url,
             wcag_tags=finding_item.wcag_tags,
-            selector=finding_item.primary_selector,
+            selector=primary_sel,
             html_snippet=(finding_item.nodes[0].html_snippet if finding_item.nodes else None),
             failure_summary=(finding_item.nodes[0].failure_summary if finding_item.nodes else None),
+            bounding_box=finding_bbox,
+            geometry_status=finding_geom_status,
             fingerprint=finding_item.fingerprint,
             is_incomplete=is_incomplete,
         )
@@ -132,11 +161,28 @@ async def persist_page_audit_results(
 
         # Store individual DOM element nodes
         for node in finding_item.nodes:
+            node_sel = node.target[0] if node.target else primary_sel
+            node_geom = geoms.get(node_sel)
+            node_bbox = None
+            node_geom_status = "not_located"
+            if node_geom:
+                if hasattr(node_geom, "bounding_box") and node_geom.bounding_box:
+                    node_bbox = node_geom.bounding_box.model_dump()
+                elif isinstance(node_geom, dict) and node_geom.get("bounding_box"):
+                    node_bbox = node_geom["bounding_box"]
+
+                if hasattr(node_geom, "status"):
+                    node_geom_status = node_geom.status
+                elif isinstance(node_geom, dict):
+                    node_geom_status = node_geom.get("status", "not_located")
+
             finding_node = FindingNode(
                 finding_id=finding.id,
                 target=node.target,
                 html_snippet=node.html_snippet,
                 failure_summary=node.failure_summary,
+                bounding_box=node_bbox,
+                geometry_status=node_geom_status,
             )
             db.add(finding_node)
 

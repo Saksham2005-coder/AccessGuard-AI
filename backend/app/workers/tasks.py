@@ -19,11 +19,13 @@ from app.db.session import get_session_maker
 from app.scanner.axe_runner import execute_axe_audit, get_axe_version
 from app.scanner.browser import create_isolated_browser_context
 from app.scanner.crawler import crawl_website
+from app.scanner.geometry import capture_element_geometries
 from app.scanner.schemas import CrawlOptions
 from app.scanner.target_policy import validate_target_url
 from app.services.project_service import get_project_verification_status
 from app.services.scan_event_service import record_scan_event
 from app.services.scan_persistence_service import persist_page_audit_results
+from app.services.storage_service import save_page_screenshot
 from app.workers.celery_app import celery_app
 
 logger = get_logger("scan_tasks")
@@ -259,6 +261,37 @@ async def _execute_scan_pipeline_core(scan_id: uuid.UUID, db: AsyncSession) -> N
                 await browser_page.goto(crawled_page.url, wait_until="domcontentloaded")
                 audit_result = await execute_axe_audit(browser_page)
 
+                # 1. Capture screenshot of page
+                page_id = uuid.uuid4()
+                screenshot_key = None
+                try:
+                    screenshot_bytes = await browser_page.screenshot(type="png", full_page=False)
+                    screenshot_key = save_page_screenshot(scan.id, page_id, screenshot_bytes)
+                except Exception as ss_err:
+                    logger.warning(
+                        "Failed to capture page screenshot", url=crawled_page.url, error=str(ss_err)
+                    )
+
+                # 2. Extract selectors from violations and incomplete items
+                all_selectors: list[str] = []
+                for v in audit_result.violations:
+                    if v.primary_selector:
+                        all_selectors.append(v.primary_selector)
+                    for n in v.nodes:
+                        if n.target:
+                            all_selectors.extend(n.target)
+                for inc in audit_result.incomplete:
+                    if inc.primary_selector:
+                        all_selectors.append(inc.primary_selector)
+                    for n in inc.nodes:
+                        if n.target:
+                            all_selectors.extend(n.target)
+
+                # 3. Capture element geometries
+                element_geometries = await capture_element_geometries(browser_page, all_selectors)
+                viewport_size = browser_page.viewport_size or {"width": 1280, "height": 800}
+                dpr = await browser_page.evaluate("() => window.devicePixelRatio || 1")
+
                 await persist_page_audit_results(
                     db,
                     scan_id=scan.id,
@@ -269,6 +302,11 @@ async def _execute_scan_pipeline_core(scan_id: uuid.UUID, db: AsyncSession) -> N
                     http_status=crawled_page.status_code,
                     load_duration_ms=int(crawled_page.load_duration_ms),
                     audit_status="completed",
+                    screenshot_storage_key=screenshot_key,
+                    viewport_width=int(viewport_size["width"]),
+                    viewport_height=int(viewport_size["height"]),
+                    device_pixel_ratio=float(dpr),
+                    element_geometries=element_geometries,
                 )
                 await record_scan_event(
                     db,

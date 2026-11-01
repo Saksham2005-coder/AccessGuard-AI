@@ -1,7 +1,7 @@
 """Accessibility finding and finding node persistence models."""
 
 import uuid
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import Boolean, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -68,6 +68,15 @@ class Finding(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         index=True,
         nullable=False,
     )
+    bounding_box: Mapped[dict[str, Any] | None] = mapped_column(
+        JSON().with_variant(JSONB, "postgresql"),
+        nullable=True,
+    )
+    geometry_status: Mapped[str | None] = mapped_column(
+        String(30),
+        default="not_located",
+        nullable=True,
+    )
     is_incomplete: Mapped[bool] = mapped_column(
         Boolean,
         default=False,
@@ -105,6 +114,15 @@ class FindingNode(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
     failure_summary: Mapped[str | None] = mapped_column(
         Text,
+        nullable=True,
+    )
+    bounding_box: Mapped[dict[str, Any] | None] = mapped_column(
+        JSON().with_variant(JSONB, "postgresql"),
+        nullable=True,
+    )
+    geometry_status: Mapped[str | None] = mapped_column(
+        String(30),
+        default="not_located",
         nullable=True,
     )
     screenshot_reference: Mapped[str | None] = mapped_column(

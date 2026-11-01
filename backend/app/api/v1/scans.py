@@ -5,18 +5,27 @@ import uuid
 from collections.abc import AsyncGenerator
 
 from fastapi import APIRouter, BackgroundTasks, Header, Query, status
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy import select
 
 from app.api.deps import CurrentUserDep, DbDep
-from app.core.errors import AuthorizationError
+from app.core.errors import AuthorizationError, NotFoundError
 from app.core.logging import get_logger
 from app.db.models.scan import Scan
+from app.db.models.scan_page import ScanPage
 from app.schemas.auth import MessageResponse
 from app.schemas.scan import ScanCreateRequest, ScanListResponse, ScanResponse
+from app.services.heatmap_service import (
+    HeatmapResponse,
+    ScanPageSummary,
+    get_page_heatmap,
+    list_scan_pages,
+    verify_scan_tenant_access,
+)
 from app.services.project_service import get_project, get_project_verification_status
 from app.services.scan_event_service import format_sse_event, get_scan_events_after
 from app.services.scan_persistence_service import create_scan_record, get_scan
+from app.services.storage_service import resolve_artifact_path
 from app.workers.tasks import (
     execute_scan_pipeline,
     request_scan_cancellation,
@@ -197,4 +206,68 @@ async def stream_scan_events(
             "Connection": "keep-alive",
             "X-Accel-Buffering": "no",
         },
+    )
+
+
+@router.get(
+    "/scans/{scan_id}/pages",
+    response_model=list[ScanPageSummary],
+    summary="List Scan Pages",
+)
+async def get_scan_pages_list(
+    scan_id: uuid.UUID,
+    current_user: CurrentUserDep,
+    db: DbDep,
+) -> list[ScanPageSummary]:
+    """List all pages audited within a scan along with screenshot and barrier indicators."""
+    return await list_scan_pages(db, scan_id, current_user.id)
+
+
+@router.get(
+    "/scans/{scan_id}/pages/{page_id}/heatmap",
+    response_model=HeatmapResponse,
+    summary="Visual Accessibility Heatmap",
+)
+async def get_scan_page_heatmap(
+    scan_id: uuid.UUID,
+    page_id: uuid.UUID,
+    current_user: CurrentUserDep,
+    db: DbDep,
+) -> HeatmapResponse:
+    """Retrieve visual accessibility heatmap coordinates, density contours, and element overlays."""
+    return await get_page_heatmap(db, scan_id, page_id, current_user.id)
+
+
+@router.get(
+    "/scans/{scan_id}/pages/{page_id}/screenshot",
+    summary="Download Page Screenshot",
+)
+async def get_scan_page_screenshot(
+    scan_id: uuid.UUID,
+    page_id: uuid.UUID,
+    current_user: CurrentUserDep,
+    db: DbDep,
+) -> FileResponse:
+    """Stream authorized screenshot image for the audited page."""
+    # Enforce tenant isolation boundary
+    await verify_scan_tenant_access(db, scan_id, current_user.id)
+
+    page_res = await db.execute(
+        select(ScanPage).where(
+            ScanPage.id == page_id,
+            ScanPage.scan_id == scan_id,
+        )
+    )
+    page = page_res.scalar_one_or_none()
+    if not page or not page.screenshot_storage_key:
+        raise NotFoundError("Screenshot not available for this page")
+
+    file_path = resolve_artifact_path(page.screenshot_storage_key)
+    if not file_path or not file_path.is_file():
+        raise NotFoundError("Screenshot file not found on storage")
+
+    return FileResponse(
+        path=str(file_path),
+        media_type="image/png",
+        filename=f"scan_{scan_id}_page_{page_id}.png",
     )
