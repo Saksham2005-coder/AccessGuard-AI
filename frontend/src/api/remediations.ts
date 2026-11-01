@@ -123,3 +123,45 @@ export async function getValidationHistoryApi(
   );
   return response.data;
 }
+
+export interface ComparisonResponse {
+  remediation_id: string;
+  finding_id: string;
+  rule_id: string;
+  before_html: string;
+  after_html: string;
+  before_screenshot_url: string | null;
+  after_screenshot_url: string | null;
+  dom_diff: string;
+  patch_operations: Array<Record<string, unknown>>;
+  original_rule_resolved: boolean;
+  new_violations: Array<{
+    rule_id: string;
+    impact: string;
+    description: string;
+    primary_selector?: string;
+  }>;
+  passed: boolean;
+  status: string;
+  created_at: string;
+  details: Record<string, unknown>;
+}
+
+export async function runRemediationComparisonApi(
+  remediationId: string
+): Promise<ComparisonResponse> {
+  const response = await apiClient.post<ComparisonResponse>(
+    `/remediations/${remediationId}/compare`
+  );
+  return response.data;
+}
+
+export async function getRemediationComparisonApi(
+  remediationId: string
+): Promise<ComparisonResponse> {
+  const response = await apiClient.get<ComparisonResponse>(
+    `/remediations/${remediationId}/comparison`
+  );
+  return response.data;
+}
+

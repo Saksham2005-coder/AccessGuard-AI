@@ -2,7 +2,8 @@
 
 import uuid
 
-from fastapi import APIRouter, Query, status
+from fastapi import APIRouter, HTTPException, Query, status
+from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
@@ -13,9 +14,14 @@ from app.db.models.remediation import Remediation
 from app.db.models.scan import Scan
 from app.db.models.scan_page import ScanPage
 from app.schemas.remediation import (
+    ComparisonResponse,
     RemediationDecisionRequest,
     RemediationResponse,
     ValidationResultResponse,
+)
+from app.services.comparison_service import (
+    generate_remediation_comparison,
+    get_remediation_comparison,
 )
 from app.services.remediation_service import (
     create_or_run_remediation_proposal,
@@ -23,6 +29,7 @@ from app.services.remediation_service import (
     record_approval_decision,
     run_remediation_snapshot_validation,
 )
+from app.services.storage_service import resolve_artifact_path
 
 router = APIRouter(tags=["remediations"])
 
@@ -180,3 +187,77 @@ async def get_remediation_validation_history(
         user_id=current_user.id,
     )
     return [ValidationResultResponse.model_validate(vr) for vr in remediation.validation_results]
+
+
+@router.post(
+    "/remediations/{remediation_id}/compare",
+    response_model=ComparisonResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def run_remediation_comparison(
+    remediation_id: uuid.UUID,
+    current_user: CurrentUserDep,
+    db: DbDep,
+) -> ComparisonResponse:
+    """Generate isolated before-and-after snapshot comparison, visual rendering, and re-audit."""
+    comparison = await generate_remediation_comparison(
+        db=db,
+        remediation_id=remediation_id,
+        user_id=current_user.id,
+    )
+    return ComparisonResponse.model_validate(comparison)
+
+
+@router.get(
+    "/remediations/{remediation_id}/comparison",
+    response_model=ComparisonResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def get_remediation_comparison_endpoint(
+    remediation_id: uuid.UUID,
+    current_user: CurrentUserDep,
+    db: DbDep,
+) -> ComparisonResponse:
+    """Retrieve isolated before-and-after snapshot comparison metadata and re-audit diff."""
+    comparison = await get_remediation_comparison(
+        db=db,
+        remediation_id=remediation_id,
+        user_id=current_user.id,
+    )
+    return ComparisonResponse.model_validate(comparison)
+
+
+@router.get(
+    "/remediations/{remediation_id}/screenshots/{variant}",
+    status_code=status.HTTP_200_OK,
+)
+async def get_remediation_screenshot(
+    remediation_id: uuid.UUID,
+    variant: str,
+    current_user: CurrentUserDep,
+    db: DbDep,
+) -> FileResponse:
+    """Stream before or after isolated screenshot artifact for an authorized remediation."""
+    if variant not in ("before", "after"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Screenshot variant must be 'before' or 'after'.",
+        )
+
+    # Tenant ownership check
+    await get_remediation_and_check_ownership(db, remediation_id, current_user.id)
+
+    storage_key = f"remediations/{remediation_id}/{variant}.png"
+    file_path = resolve_artifact_path(storage_key)
+    if not file_path or not file_path.exists():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Remediation screenshot '{variant}' is not yet generated or available.",
+        )
+
+    return FileResponse(
+        path=str(file_path),
+        media_type="image/png",
+        filename=f"remediation-{remediation_id}-{variant}.png",
+    )
+

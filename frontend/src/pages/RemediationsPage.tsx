@@ -8,6 +8,7 @@ import {
   FileCheck2,
   Play,
   Shield,
+  SlidersHorizontal,
   Sparkles,
   ThumbsDown,
   ThumbsUp,
@@ -26,11 +27,13 @@ import {
   validateRemediationApi,
   Remediation,
 } from "../api/remediations";
+import { LiveComparisonModal } from "../components/remediations/LiveComparisonModal";
 
 export function RemediationsPage() {
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [selectedRemediation, setSelectedRemediation] = useState<Remediation | null>(null);
+  const [comparisonRemediationId, setComparisonRemediationId] = useState<string | null>(null);
   const [actionType, setActionType] = useState<"approve" | "reject" | null>(null);
   const [comments, setComments] = useState<string>("");
 
@@ -351,6 +354,18 @@ export function RemediationsPage() {
                     </div>
 
                     <div className="flex items-center gap-2">
+                      {/* Compare button */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setComparisonRemediationId(r.id)}
+                        className="text-xs gap-1.5"
+                        title="Compare original vs proposed snapshot in isolated sandbox"
+                      >
+                        <SlidersHorizontal className="h-3.5 w-3.5 text-[#38BDF8]" />
+                        <span>Live Comparison</span>
+                      </Button>
+
                       {/* If approved but not validated yet, allow triggering snapshot validation */}
                       {isApproved && (
                         <Button
@@ -441,6 +456,25 @@ export function RemediationsPage() {
           </div>
         </div>
       </Dialog>
+
+      {/* Live Comparison Modal */}
+      <LiveComparisonModal
+        remediationId={comparisonRemediationId}
+        isOpen={Boolean(comparisonRemediationId)}
+        onClose={() => setComparisonRemediationId(null)}
+        onApprove={(id) => {
+          const target = remediations.find((rem) => rem.id === id);
+          if (target) handleOpenAction(target, "approve");
+        }}
+        onReject={(id) => {
+          const target = remediations.find((rem) => rem.id === id);
+          if (target) handleOpenAction(target, "reject");
+        }}
+        isPendingApproval={
+          remediations.find((rem) => rem.id === comparisonRemediationId)?.status ===
+          "pending_approval"
+        }
+      />
     </div>
   );
 }

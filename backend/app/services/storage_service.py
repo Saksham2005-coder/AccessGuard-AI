@@ -42,6 +42,23 @@ def save_page_screenshot(
     return f"screenshots/{scan_id}/{filename}"
 
 
+def save_remediation_screenshot(
+    remediation_id: uuid.UUID,
+    variant: str,
+    image_bytes: bytes,
+) -> str:
+    """Save remediation before/after screenshot to storage root and return relative storage key."""
+    storage_root = get_storage_root()
+    remediation_dir = storage_root / "remediations" / str(remediation_id)
+    remediation_dir.mkdir(parents=True, exist_ok=True)
+
+    filename = f"{variant}.png"
+    file_path = remediation_dir / filename
+    file_path.write_bytes(image_bytes)
+
+    return f"remediations/{remediation_id}/{filename}"
+
+
 def resolve_artifact_path(storage_key: str) -> Path | None:
     """Safely resolve an artifact storage key preventing path traversal."""
     if not storage_key or ".." in storage_key or storage_key.startswith(("/", "\\")):

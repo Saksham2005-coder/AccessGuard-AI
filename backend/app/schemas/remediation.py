@@ -71,3 +71,26 @@ class RemediationResponse(BaseModel):
     validation_results: list[ValidationResultResponse] = Field(default_factory=list)
     created_at: datetime
     updated_at: datetime
+
+
+class ComparisonResponse(BaseModel):
+    """Isolated DOM snapshot comparison schema with before/after visual and structural diffs."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    remediation_id: uuid.UUID
+    finding_id: uuid.UUID
+    rule_id: str
+    before_html: str
+    after_html: str
+    before_screenshot_url: str | None = None
+    after_screenshot_url: str | None = None
+    dom_diff: str
+    patch_operations: list[dict[str, Any]] = Field(default_factory=list)
+    original_rule_resolved: bool
+    new_violations: list[dict[str, Any]] = Field(default_factory=list)
+    passed: bool
+    status: str
+    created_at: datetime
+    details: dict[str, Any] = Field(default_factory=dict)
+
