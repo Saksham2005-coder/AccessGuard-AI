@@ -55,8 +55,9 @@ export function LandingPage() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center">
+      <main id="main-content">
+        {/* Hero Section */}
+        <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--border-graphite)] bg-[var(--bg-card)] text-xs text-[var(--text-secondary)] mb-6 shadow-sm">
           <span className="flex h-2 w-2 rounded-full bg-emerald-400" />
           <span>WCAG 2.2 AA & Section 508 Automated Compliance</span>
@@ -91,7 +92,7 @@ export function LandingPage() {
           </Link>
         </div>
 
-        <div className="mt-6 text-xs text-[var(--text-muted)] flex items-center justify-center gap-4">
+        <div className="mt-6 text-xs text-[var(--text-secondary)] flex items-center justify-center gap-4">
           <span>✓ Cryptographic DNS TXT verification</span>
           <span>•</span>
           <span>✓ Strict SSRF defense</span>
@@ -198,14 +199,15 @@ export function LandingPage() {
 
       {/* Honest Compliance Notice */}
       <section className="py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center border-t border-[var(--border-graphite)]/50">
-        <div className="rounded-lg bg-[var(--bg-elevated)] p-4 border border-[var(--border-graphite)] text-xs text-[var(--text-muted)] leading-relaxed">
-          <strong className="text-[var(--text-secondary)]">Important Compliance Transparency Notice:</strong> Automated accessibility tools evaluate a subset of measurable WCAG success criteria (such as contrast, form labeling, image text alternatives, and landmark semantics). Automated scanning does not constitute full legal certification under the Americans with Disabilities Act (ADA), Section 508, or European Standard EN 301 549, and should be paired with human assistive technology evaluation.
+        <div className="rounded-lg bg-[var(--bg-elevated)] p-4 border border-[var(--border-graphite)] text-xs text-[var(--text-secondary)] leading-relaxed">
+          <strong className="text-[var(--text-primary)]">Important Compliance Transparency Notice:</strong> Automated accessibility tools evaluate a subset of measurable WCAG success criteria (such as contrast, form labeling, image text alternatives, and landmark semantics). Automated scanning does not constitute full legal certification under the Americans with Disabilities Act (ADA), Section 508, or European Standard EN 301 549, and should be paired with human assistive technology evaluation.
         </div>
       </section>
+      </main>
 
       {/* Footer */}
       <footer className="mt-auto border-t border-[var(--border-graphite)] bg-[var(--bg-sidebar)] py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--text-muted)]">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--text-secondary)]">
           <div className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-[var(--electric-blue)]" />
             <span>AccessGuard AI © 2026. All rights reserved.</span>

@@ -71,7 +71,7 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#111315] px-4 py-12 text-[#F3F4F6] selection:bg-[#38BDF8]/20 selection:text-[#F3F4F6]">
+    <main className="min-h-screen flex items-center justify-center bg-[#111315] px-4 py-12 text-[#F3F4F6] selection:bg-[#38BDF8]/20 selection:text-[#F3F4F6]">
       <div className="w-full max-w-md">
         {/* Brand Header */}
         <div className="flex flex-col items-center mb-8 text-center">
@@ -245,10 +245,10 @@ export function RegisterPage() {
         </Card>
 
         {/* Security Footer Notice */}
-        <div className="mt-8 text-center text-[11px] text-[#6B7280]">
+        <div className="mt-8 text-center text-[11px] text-[#9CA3AF]">
           Strict Argon2id hashing • Cryptographically signed JWT sessions
         </div>
       </div>
-    </div>
+    </main>
   );
 }

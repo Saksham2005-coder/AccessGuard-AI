@@ -4,7 +4,7 @@ import { Button } from "../components/ui/Button";
 
 export function NotFoundPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#111315] px-4 py-12 text-[#F3F4F6]">
+    <main className="min-h-screen flex items-center justify-center bg-[#111315] px-4 py-12 text-[#F3F4F6]">
       <div className="w-full max-w-md text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#252C35] border border-[#303741] text-[#38BDF8] mb-5 shadow-lg shadow-[#38BDF8]/5">
           <AlertCircle className="h-7 w-7 text-[#38BDF8]" />
@@ -24,6 +24,6 @@ export function NotFoundPage() {
           </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
