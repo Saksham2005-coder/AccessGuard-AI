@@ -4,8 +4,10 @@ import asyncio
 
 from fastapi import APIRouter, Response, status
 from pydantic import BaseModel, Field
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import SettingsDep
+from app.api.deps import DbDep, SettingsDep
 from app.core.logging import get_logger
 
 logger = get_logger("health")
@@ -35,35 +37,66 @@ class ReadinessResponse(BaseModel):
     checks: dict[str, DependencyCheck]
 
 
-async def probe_postgres(_db_url: str, _timeout: float = 2.0) -> DependencyCheck:
-    """Check PostgreSQL connectivity with bounded timeout."""
+async def probe_postgres(db: AsyncSession, timeout: float = 2.0) -> DependencyCheck:
+    """Check database connectivity with bounded timeout and safe error reporting."""
     try:
-        # In Phase 2, when database models are not yet initialized, perform a quick probe
-        # In Phase 3, this executes `SELECT 1` through SQLAlchemy async session
+        async with asyncio.timeout(timeout):
+            await db.execute(text("SELECT 1"))
         return DependencyCheck(status="ok")
     except TimeoutError:
+        logger.warning("Database readiness probe timed out")
         return DependencyCheck(status="unhealthy", message="Database connection timed out")
     except Exception as e:
-        return DependencyCheck(status="unhealthy", message=str(e))
+        logger.warning("Database readiness probe failed", error=str(e))
+        return DependencyCheck(status="unhealthy", message="Database connectivity check failed")
 
 
-async def probe_redis(_redis_url: str, _timeout: float = 2.0) -> DependencyCheck:
-    """Check Redis connectivity with bounded timeout."""
-    try:
-        # Checked via async Redis client in subsequent phases
+async def probe_redis(redis_url: str, timeout: float = 2.0) -> DependencyCheck:
+    """Check Redis connectivity with bounded timeout and safe error reporting."""
+    if not redis_url or redis_url in (":memory:", "mock", "disabled"):
         return DependencyCheck(status="ok")
+
+    try:
+        import redis.asyncio as aioredis
+
+        client = aioredis.from_url(
+            redis_url,
+            socket_timeout=timeout,
+            socket_connect_timeout=timeout,
+        )
+        try:
+            async with asyncio.timeout(timeout):
+                pong = await client.ping()
+                if pong:
+                    return DependencyCheck(status="ok")
+                return DependencyCheck(status="unhealthy", message="Redis ping failed")
+        finally:
+            await client.close()
     except TimeoutError:
+        logger.warning("Redis readiness probe timed out")
         return DependencyCheck(status="unhealthy", message="Redis connection timed out")
     except Exception as e:
-        return DependencyCheck(status="unhealthy", message=str(e))
+        logger.warning("Redis readiness probe failed", error=str(e))
+        return DependencyCheck(status="unhealthy", message="Redis connectivity check failed")
 
 
-async def probe_qdrant(_qdrant_url: str, _timeout: float = 2.0) -> DependencyCheck:
-    """Check Qdrant vector database accessibility with bounded timeout."""
-    try:
+async def probe_qdrant(qdrant_url: str, timeout: float = 2.0) -> DependencyCheck:
+    """Check Qdrant vector database accessibility with bounded timeout and safe error reporting."""
+    if not qdrant_url or qdrant_url in (":memory:", "memory"):
         return DependencyCheck(status="ok")
+
+    try:
+        from qdrant_client import QdrantClient
+
+        client = QdrantClient(url=qdrant_url, timeout=int(timeout))
+        client.collection_exists("wcag_knowledge")
+        return DependencyCheck(status="ok")
+    except TimeoutError:
+        logger.warning("Qdrant readiness probe timed out")
+        return DependencyCheck(status="unhealthy", message="Vector store connection timed out")
     except Exception as e:
-        return DependencyCheck(status="unhealthy", message=str(e))
+        logger.warning("Qdrant readiness probe failed", error=str(e))
+        return DependencyCheck(status="unhealthy", message="Vector store connectivity check failed")
 
 
 @router.get("/health/live", response_model=LivenessResponse, summary="Liveness Probe")
@@ -73,13 +106,17 @@ async def health_live() -> LivenessResponse:
 
 
 @router.get("/health/ready", response_model=ReadinessResponse, summary="Readiness Probe")
-async def health_ready(settings: SettingsDep, response: Response) -> ReadinessResponse:
+async def health_ready(
+    settings: SettingsDep,
+    response: Response,
+    db: DbDep,
+) -> ReadinessResponse:
     """Evaluate core dependency connectivity before accepting traffic."""
     checks: dict[str, DependencyCheck] = {}
 
     # Run probes concurrently with bounded timeouts
     db_check, redis_check, qdrant_check = await asyncio.gather(
-        probe_postgres(settings.DATABASE_URL),
+        probe_postgres(db),
         probe_redis(settings.REDIS_URL),
         probe_qdrant(settings.QDRANT_URL),
         return_exceptions=False,
