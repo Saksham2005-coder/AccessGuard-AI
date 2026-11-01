@@ -129,12 +129,17 @@ async def create_isolated_browser_context(
     allow_loopback: bool = False,
     navigation_timeout_ms: int = DEFAULT_NAVIGATION_TIMEOUT_MS,
     page_timeout_ms: int = DEFAULT_PAGE_TIMEOUT_MS,
+    viewport: ViewportSize | None = None,
+    is_mobile: bool = False,
+    device_scale_factor: float = 1.0,
 ) -> AsyncGenerator[BrowserContext, None]:
     """Provide a pristine, ephemeral, hardened BrowserContext for a single scan task."""
     browser = await browser_manager.get_browser()
 
     context = await browser.new_context(
-        viewport=DEFAULT_VIEWPORT,
+        viewport=viewport or DEFAULT_VIEWPORT,
+        is_mobile=is_mobile,
+        device_scale_factor=device_scale_factor,
         user_agent=DEFAULT_USER_AGENT,
         locale="en-US",
         timezone_id="UTC",

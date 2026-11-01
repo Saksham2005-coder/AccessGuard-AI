@@ -10,6 +10,7 @@ import {
   Play,
   RotateCw,
   ShieldAlert,
+  Smartphone,
 } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Badge";
@@ -22,6 +23,7 @@ import { CreateScanModal } from "../components/scans/CreateScanModal";
 import { ScanDetailModal } from "../components/scans/ScanDetailModal";
 import { RegressionMonitoringModal } from "../components/regression/RegressionMonitoringModal";
 import { AssistantChatModal } from "../components/assistant/AssistantChatModal";
+import { ResponsiveMatrixModal } from "../components/responsive/ResponsiveMatrixModal";
 
 export function ScansPage() {
   const navigate = useNavigate();
@@ -33,6 +35,8 @@ export function ScansPage() {
   const [isRegressionOpen, setIsRegressionOpen] = useState(false);
   const [assistantScan, setAssistantScan] = useState<Scan | null>(null);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const [responsiveScan, setResponsiveScan] = useState<Scan | null>(null);
+  const [isResponsiveOpen, setIsResponsiveOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<string>("");
 
   // Fetch available projects
@@ -303,6 +307,21 @@ export function ScansPage() {
                                 <History className="h-3.5 w-3.5 text-indigo-400" />
                                 <span>Regressions</span>
                               </Button>
+
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setResponsiveScan(scan);
+                                  setIsResponsiveOpen(true);
+                                }}
+                                className="text-xs gap-1.5 text-purple-400 border-purple-900/40 hover:bg-purple-950/20"
+                                data-testid={`viewports-btn-${scan.id}`}
+                              >
+                                <Smartphone className="h-3.5 w-3.5 text-purple-400" />
+                                <span>Viewports</span>
+                              </Button>
                             </>
                           )}
                         </div>
@@ -366,6 +385,19 @@ export function ScansPage() {
           projectId={activeProjectId}
           scanId={assistantScan.id}
           targetUrl={assistantScan.target_url}
+        />
+      )}
+
+      {/* Responsive Multi-Viewport Matrix Modal */}
+      {responsiveScan && (
+        <ResponsiveMatrixModal
+          isOpen={isResponsiveOpen}
+          onClose={() => {
+            setIsResponsiveOpen(false);
+            setResponsiveScan(null);
+          }}
+          scanId={responsiveScan.id}
+          targetUrl={responsiveScan.target_url}
         />
       )}
     </div>
