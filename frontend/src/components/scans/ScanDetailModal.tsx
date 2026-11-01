@@ -4,9 +4,11 @@ import {
   AlertCircle,
   AlertTriangle,
   Ban,
+  Brain,
   CheckCircle2,
   MapPin,
 } from "lucide-react";
+
 import { Dialog } from "../ui/Dialog";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
@@ -18,6 +20,7 @@ import {
   listScanPagesApi,
 } from "../../api/heatmap";
 import { VisualHeatmapViewer } from "../heatmap/VisualHeatmapViewer";
+import { AutonomousInvestigationPanel } from "../investigations/AutonomousInvestigationPanel";
 
 export interface ScanDetailModalProps {
   scanId: string | null;
@@ -37,7 +40,8 @@ export function ScanDetailModal({
   const [scan, setScan] = useState<Scan | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"telemetry" | "heatmap">("telemetry");
+  const [activeTab, setActiveTab] = useState<"telemetry" | "heatmap" | "investigations">("telemetry");
+
 
   // Heatmap state
   const [pages, setPages] = useState<ScanPageSummary[]>([]);
@@ -196,9 +200,15 @@ export function ScanDetailModal({
     <Dialog
       isOpen={isOpen}
       onClose={onClose}
-      title={activeTab === "heatmap" ? "Visual Accessibility Heatmap" : "Audit Execution Telemetry"}
+      title={
+        activeTab === "heatmap"
+          ? "Visual Accessibility Heatmap"
+          : activeTab === "investigations"
+          ? "Autonomous Accessibility Investigation"
+          : "Audit Execution Telemetry"
+      }
       description={`Real-time Playwright execution logs, coordinate telemetry, and axe-core audit results for ${scan?.target_url || ""}`}
-      className={activeTab === "heatmap" ? "max-w-5xl" : "max-w-2xl"}
+      className={activeTab === "heatmap" || activeTab === "investigations" ? "max-w-5xl" : "max-w-2xl"}
     >
       <div className="space-y-4 pt-2">
         {/* Navigation Tabs */}
@@ -232,6 +242,18 @@ export function ScanDetailModal({
               </span>
             )}
           </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("investigations")}
+            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+              activeTab === "investigations"
+                ? "bg-[#252C35] text-[#38BDF8]"
+                : "text-[#9CA3AF] hover:text-[#F3F4F6]"
+            }`}
+          >
+            <Brain className="h-4 w-4" />
+            <span>AI Investigation</span>
+          </button>
         </div>
 
         {/* Error Alert */}
@@ -259,7 +281,10 @@ export function ScanDetailModal({
               }
             }}
           />
+        ) : activeTab === "investigations" ? (
+          <AutonomousInvestigationPanel scanId={scanId!} />
         ) : (
+
           <>
             {/* Status & Engine Header */}
             <div className="flex items-center justify-between p-3.5 rounded-xl border border-[#303741] bg-[#171C23]">
