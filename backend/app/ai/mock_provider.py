@@ -1,7 +1,7 @@
 """Deterministic in-memory Mock LLM provider for fast, reproducible testing without network calls."""
 
 import uuid
-from typing import Any, TypeVar
+from typing import Any, TypeVar, cast
 
 from pydantic import BaseModel
 
@@ -77,7 +77,7 @@ class MockLLMProvider(LLMProvider):
                 if "alt" in rule_id or "image" in rule_id
                 else ["1.4.3" if "contrast" in rule_id else "4.1.2"]
             )
-            result = FindingAnalysis(
+            analysis = FindingAnalysis(
                 summary=f"Automated finding for '{rule_id}': element requires accessible markup.",
                 likely_root_cause=f"The element matching '{selector}' violates WCAG requirements for {rule_id}.",
                 affected_element_type="img" if "alt" in rule_id else "interactive_control",
@@ -86,7 +86,7 @@ class MockLLMProvider(LLMProvider):
                 limitations=["Automated rule test only", "Color perception varies across monitors"],
                 evidence_chunk_ids=evidence_ids,
             )
-            return result  # type: ignore[return-value]
+            return cast(T, analysis)
 
         # 2. RemediationProposal Mock
         if issubclass(output_schema, RemediationProposal):
@@ -122,7 +122,7 @@ class MockLLMProvider(LLMProvider):
             else:
                 after_snippet = f"<!-- Adjusted for {rule_id} -->\n{snippet}"
 
-            result = RemediationProposal(
+            proposal = RemediationProposal(
                 problem=f"Assistive technology cannot properly parse element matching '{selector}'.",
                 recommendation=f"Add necessary attributes to conform with accessibility requirements for {rule_id}.",
                 before_snippet=snippet,
@@ -137,12 +137,12 @@ class MockLLMProvider(LLMProvider):
                 evidence_chunk_ids=evidence_ids,
                 model_confidence=0.95,
             )
-            return result  # type: ignore[return-value]
+            return cast(T, proposal)
 
         # 3. ReviewResult Mock
         if issubclass(output_schema, ReviewResult):
             has_rejection = bool(user_payload.get("simulate_rejection", False))
-            result = ReviewResult(
+            review = ReviewResult(
                 accepted_for_human_review=not has_rejection,
                 rejection_reasons=["Simulated policy rejection"] if has_rejection else [],
                 evidence_complete=bool(evidence_ids),
@@ -153,7 +153,7 @@ class MockLLMProvider(LLMProvider):
                 ],
                 policy_checks_failed=["disallowed_attributes"] if has_rejection else [],
             )
-            return result  # type: ignore[return-value]
+            return cast(T, review)
 
         # Generic Pydantic fallback instantiation
         return output_schema.model_validate({})

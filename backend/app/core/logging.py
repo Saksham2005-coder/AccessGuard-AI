@@ -3,7 +3,8 @@
 import logging
 import re
 import sys
-from typing import Any
+from collections.abc import MutableMapping
+from typing import Any, cast
 
 import structlog
 
@@ -36,13 +37,13 @@ def scrub_sensitive_text(text: str) -> str:
     return text
 
 
-def censor_sensitive_dict(d: dict[str, Any]) -> dict[str, Any]:
+def censor_sensitive_dict(d: MutableMapping[str, Any]) -> dict[str, Any]:
     """Recursively redact dictionary keys and string values that match sensitive patterns."""
     clean: dict[str, Any] = {}
     for k, v in d.items():
         if any(sensitive in k.lower() for sensitive in SENSITIVE_KEYS):
             clean[k] = "[REDACTED]"
-        elif isinstance(v, dict):
+        elif isinstance(v, MutableMapping):
             clean[k] = censor_sensitive_dict(v)
         elif isinstance(v, str):
             clean[k] = scrub_sensitive_text(v)
@@ -52,13 +53,13 @@ def censor_sensitive_dict(d: dict[str, Any]) -> dict[str, Any]:
 
 
 def censor_sensitive_data(
-    _logger: Any, _method_name: str, event_dict: dict[str, Any]
-) -> dict[str, Any]:
+    _logger: Any, _method_name: str, event_dict: MutableMapping[str, Any]
+) -> MutableMapping[str, Any]:
     """Censor sensitive parameters and raw key patterns in log payloads."""
     for key, value in list(event_dict.items()):
         if any(sensitive in key.lower() for sensitive in SENSITIVE_KEYS):
             event_dict[key] = "[REDACTED]"
-        elif isinstance(value, dict):
+        elif isinstance(value, MutableMapping):
             event_dict[key] = censor_sensitive_dict(value)
         elif isinstance(value, str):
             event_dict[key] = scrub_sensitive_text(value)
@@ -66,8 +67,8 @@ def censor_sensitive_data(
 
 
 def inject_request_id(
-    _logger: Any, _method_name: str, event_dict: dict[str, Any]
-) -> dict[str, Any]:
+    _logger: Any, _method_name: str, event_dict: MutableMapping[str, Any]
+) -> MutableMapping[str, Any]:
     """Inject current context request ID into all structured logs."""
     req_id = get_request_id()
     if req_id and "request_id" not in event_dict:
@@ -110,4 +111,4 @@ def setup_logging(app_env: str = "development") -> None:
 
 def get_logger(name: str = "accessguard") -> structlog.stdlib.BoundLogger:
     """Return a configured structlog bound logger."""
-    return structlog.get_logger(name)
+    return cast(structlog.stdlib.BoundLogger, structlog.get_logger(name))

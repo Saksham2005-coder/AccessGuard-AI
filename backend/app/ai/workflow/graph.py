@@ -1,5 +1,6 @@
 """StateGraph construction and conditional routing for AccessGuard AI."""
 
+from collections.abc import Hashable
 from typing import Any, Literal
 
 from langgraph.graph import END, START, StateGraph
@@ -157,7 +158,7 @@ def build_remediation_graph(
             return "remediation_proposal"
         return "mark_manual_review"
 
-    review_destinations = {
+    review_destinations: dict[Hashable, str] = {
         "remediation_proposal": "remediation_proposal",
         "mark_manual_review": "mark_manual_review",
     }

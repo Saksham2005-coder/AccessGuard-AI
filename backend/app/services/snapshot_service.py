@@ -3,6 +3,7 @@
 import hashlib
 import json
 import re
+from collections.abc import Sequence
 from typing import Any
 
 from bs4 import BeautifulSoup
@@ -28,7 +29,7 @@ def compute_snapshot_hash(html: str) -> str:
     return hashlib.sha256(normalized).hexdigest()
 
 
-def compute_patch_hash(operations: list[dict[str, Any] | PatchOperation]) -> str:
+def compute_patch_hash(operations: Sequence[dict[str, Any] | PatchOperation]) -> str:
     """Compute SHA-256 checksum of canonical patch operations JSON."""
     clean_ops = [op.model_dump() if isinstance(op, PatchOperation) else op for op in operations]
     canonical_json = json.dumps(clean_ops, sort_keys=True, separators=(",", ":"))
@@ -56,8 +57,8 @@ def sanitize_dom_snapshot(html: str) -> str:
 
     # 2. Remove external stylesheet links and tracker preloads
     for link in soup.find_all("link"):
-        rel = link.get("rel", [])
-        rel_str = " ".join(rel).lower() if isinstance(rel, list) else str(rel).lower()
+        rel = link.get("rel")
+        rel_str = " ".join(rel).lower() if isinstance(rel, list) else str(rel or "").lower()
         if "stylesheet" in rel_str or "preload" in rel_str or "dns-prefetch" in rel_str:
             link.decompose()
 
@@ -83,7 +84,7 @@ def sanitize_dom_snapshot(html: str) -> str:
 
 def apply_dom_patch(
     html: str,
-    operations: list[dict[str, Any] | PatchOperation],
+    operations: Sequence[dict[str, Any] | PatchOperation],
 ) -> tuple[str, list[dict[str, Any]]]:
     """Apply strictly allowlisted DOM patch operations to an HTML document.
 

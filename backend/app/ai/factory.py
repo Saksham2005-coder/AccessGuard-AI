@@ -31,6 +31,7 @@ def get_llm_provider(force_new: bool = False, provider_override: str | None = No
     settings = get_settings()
     provider_type = (provider_override or settings.LLM_PROVIDER).lower()
 
+    provider: LLMProvider
     if provider_type == "mock":
         provider = MockLLMProvider()
     elif provider_type == "gemini":

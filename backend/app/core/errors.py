@@ -1,6 +1,4 @@
-"""Centralized application exception definitions and response schemas."""
-
-from typing import Any
+from typing import Any, cast
 
 from fastapi import Request, status
 from fastapi.exceptions import RequestValidationError
@@ -161,47 +159,49 @@ class InfrastructureUnavailableError(AppException):
         )
 
 
-async def app_exception_handler(_: Request, exc: AppException) -> JSONResponse:
+async def app_exception_handler(_: Request, exc: Exception) -> JSONResponse:
     """Handle custom application exceptions."""
+    app_exc = cast(AppException, exc)
     req_id = get_request_id()
-    if exc.status_code >= 500:
+    if app_exc.status_code >= 500:
         logger.error(
             "Application error",
-            code=exc.code,
-            message=exc.message,
-            status_code=exc.status_code,
-            details=exc.details,
+            code=app_exc.code,
+            message=app_exc.message,
+            status_code=app_exc.status_code,
+            details=app_exc.details,
             request_id=req_id,
         )
     else:
         logger.info(
             "Client error",
-            code=exc.code,
-            message=exc.message,
-            status_code=exc.status_code,
-            details=exc.details,
+            code=app_exc.code,
+            message=app_exc.message,
+            status_code=app_exc.status_code,
+            details=app_exc.details,
             request_id=req_id,
         )
 
     response_data = ErrorResponse(
         error=ErrorBody(
-            code=exc.code,
-            message=exc.message,
+            code=app_exc.code,
+            message=app_exc.message,
             request_id=req_id,
-            details=exc.details,
+            details=app_exc.details,
         )
     )
     return JSONResponse(
-        status_code=exc.status_code,
+        status_code=app_exc.status_code,
         content=response_data.model_dump(),
     )
 
 
-async def validation_exception_handler(_: Request, exc: RequestValidationError) -> JSONResponse:
+async def validation_exception_handler(_: Request, exc: Exception) -> JSONResponse:
     """Handle FastAPI and Pydantic schema validation errors."""
+    val_exc = cast(RequestValidationError, exc)
     req_id = get_request_id()
     formatted_errors: dict[str, Any] = {}
-    for err in exc.errors():
+    for err in val_exc.errors():
         field = ".".join(str(loc) for loc in err["loc"] if loc not in ("body",))
         formatted_errors[field or "request"] = err["msg"]
 

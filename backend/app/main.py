@@ -3,6 +3,7 @@
 import time
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from typing import cast
 
 from fastapi import FastAPI, Request, Response
 from fastapi.exceptions import RequestValidationError
@@ -71,7 +72,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             request_id=req_id,
         )
 
-        response = await call_next(request)
+        response: Response = cast(Response, await call_next(request))
 
         duration_ms = round((time.perf_counter() - start_time) * 1000, 2)
         response.headers["X-Request-ID"] = req_id

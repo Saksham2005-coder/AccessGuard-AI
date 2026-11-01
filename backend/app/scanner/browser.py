@@ -11,6 +11,7 @@ from playwright.async_api import (
     BrowserContext,
     Playwright,
     Route,
+    ViewportSize,
     async_playwright,
 )
 
@@ -20,7 +21,7 @@ from app.scanner.target_policy import classify_ip_address
 logger = get_logger("browser_context")
 
 # Canonical desktop viewport for deterministic auditing
-DEFAULT_VIEWPORT = {"width": 1365, "height": 900}
+DEFAULT_VIEWPORT: ViewportSize = {"width": 1365, "height": 900}
 DEFAULT_USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 AccessGuard-Audit/1.0"

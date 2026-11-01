@@ -2,7 +2,7 @@
 
 import pytest
 
-from app.ai.exceptions import LLMAuthenticationError
+from app.ai.exceptions import LLMAuthenticationError, LLMRateLimitError
 from app.ai.gemini_provider import GeminiLLMProvider
 from app.ai.groq_provider import GroqLLMProvider
 from app.ai.prompts import load_prompt
@@ -96,5 +96,7 @@ async def test_gemini_provider_live_structured_generation() -> None:
         assert len(result.likely_root_cause) >= 10
         assert "1.1.1" in result.relevant_criterion_ids
         assert evidence_chunk_id in result.evidence_chunk_ids
+    except LLMRateLimitError as exc:
+        pytest.skip(f"Gemini API rate limit or quota exceeded: {exc}")
     finally:
         await provider.aclose()

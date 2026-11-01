@@ -3,6 +3,7 @@
 import ipaddress
 import urllib.parse
 from collections.abc import Callable, Coroutine
+from collections.abc import Set as AbstractSet
 from typing import Any
 
 import dns.asyncresolver
@@ -179,7 +180,7 @@ async def validate_target_url(
     verified_base_domain: str,
     allow_loopback: bool = False,
     allow_subdomains: bool = False,
-    allowed_ports: set[int] | None = None,
+    allowed_ports: AbstractSet[int] | None = None,
 ) -> str:
     """Perform end-to-end target validation for a prospective scan URL.
 
@@ -201,6 +202,7 @@ async def validate_target_url(
         )
 
     # Port validation
+    permitted_ports: AbstractSet[int] | None
     if allowed_ports is not None:
         permitted_ports = allowed_ports
     elif allow_loopback:

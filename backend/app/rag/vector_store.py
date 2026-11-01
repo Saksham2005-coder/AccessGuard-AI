@@ -46,7 +46,7 @@ class QdrantVectorStore:
                 self.client = QdrantClient(":memory:")
             else:
                 try:
-                    c = QdrantClient(url=settings.QDRANT_URL, timeout=1.5)
+                    c = QdrantClient(url=settings.QDRANT_URL, timeout=2)
                     c.collection_exists(self.collection_name)
                     self.client = c
                 except Exception as e:
@@ -110,7 +110,7 @@ class QdrantVectorStore:
 
         query_filter: models.Filter | None = None
         if filter_dict:
-            must_conditions: list[models.FieldCondition] = []
+            must_conditions: list[models.Condition] = []
             for key, val in filter_dict.items():
                 if val is not None:
                     must_conditions.append(

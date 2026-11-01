@@ -2,6 +2,7 @@
 
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -10,6 +11,9 @@ from app.services.verification_service import (
     get_expected_txt_value,
     get_verification_record_name,
 )
+
+if TYPE_CHECKING:
+    from app.db.models.domain_verification import ProjectDomainVerification
 
 
 class ProjectCreateRequest(BaseModel):
@@ -79,7 +83,7 @@ class DomainVerificationResponse(BaseModel):
     created_at: datetime
 
     @classmethod
-    def from_model(cls, model: object) -> "DomainVerificationResponse":
+    def from_model(cls, model: "ProjectDomainVerification") -> "DomainVerificationResponse":
         """Build response with computed DNS record name and expected value."""
         return cls(
             id=model.id,
