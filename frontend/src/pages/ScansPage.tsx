@@ -5,6 +5,7 @@ import {
   Activity,
   AlertTriangle,
   ExternalLink,
+  History,
   Play,
   RotateCw,
   ShieldAlert,
@@ -18,6 +19,7 @@ import { listProjectsApi } from "../api/projects";
 import { listProjectScansApi, Scan } from "../api/scans";
 import { CreateScanModal } from "../components/scans/CreateScanModal";
 import { ScanDetailModal } from "../components/scans/ScanDetailModal";
+import { RegressionMonitoringModal } from "../components/regression/RegressionMonitoringModal";
 
 export function ScansPage() {
   const navigate = useNavigate();
@@ -25,6 +27,8 @@ export function ScansPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedScanId, setSelectedScanId] = useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [regressionScan, setRegressionScan] = useState<Scan | null>(null);
+  const [isRegressionOpen, setIsRegressionOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<string>("");
 
   // Fetch available projects
@@ -253,18 +257,35 @@ export function ScansPage() {
                       </td>
 
                       <td className="px-5 py-4 text-right">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenDetail(scan.id);
-                          }}
-                          className="text-xs gap-1.5"
-                        >
-                          <Activity className="h-3.5 w-3.5 text-[#38BDF8]" />
-                          <span>View Telemetry</span>
-                        </Button>
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenDetail(scan.id);
+                            }}
+                            className="text-xs gap-1.5"
+                          >
+                            <Activity className="h-3.5 w-3.5 text-[#38BDF8]" />
+                            <span>View Telemetry</span>
+                          </Button>
+                          {isCompleted && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setRegressionScan(scan);
+                                setIsRegressionOpen(true);
+                              }}
+                              className="text-xs gap-1.5 text-indigo-400 border-indigo-900/40 hover:bg-indigo-950/20"
+                            >
+                              <History className="h-3.5 w-3.5 text-indigo-400" />
+                              <span>Regressions</span>
+                            </Button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -299,6 +320,20 @@ export function ScansPage() {
           navigate(`/app/findings?finding_id=${findingId}`);
         }}
       />
+
+      {/* Regression Monitoring Modal */}
+      {regressionScan && (
+        <RegressionMonitoringModal
+          isOpen={isRegressionOpen}
+          onClose={() => {
+            setIsRegressionOpen(false);
+            setRegressionScan(null);
+          }}
+          projectId={activeProjectId}
+          currentScan={regressionScan}
+          availableScans={scans}
+        />
+      )}
     </div>
   );
 }
