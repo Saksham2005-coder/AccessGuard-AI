@@ -7,7 +7,9 @@ import {
   Brain,
   CheckCircle2,
   MapPin,
+  Volume2,
 } from "lucide-react";
+
 
 import { Dialog } from "../ui/Dialog";
 import { Button } from "../ui/Button";
@@ -21,6 +23,7 @@ import {
 } from "../../api/heatmap";
 import { VisualHeatmapViewer } from "../heatmap/VisualHeatmapViewer";
 import { AutonomousInvestigationPanel } from "../investigations/AutonomousInvestigationPanel";
+import { ScreenReaderSimulator } from "../screenreader/ScreenReaderSimulator";
 
 export interface ScanDetailModalProps {
   scanId: string | null;
@@ -40,7 +43,8 @@ export function ScanDetailModal({
   const [scan, setScan] = useState<Scan | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"telemetry" | "heatmap" | "investigations">("telemetry");
+  const [activeTab, setActiveTab] = useState<"telemetry" | "heatmap" | "screen_reader" | "investigations">("telemetry");
+
 
 
   // Heatmap state
@@ -203,20 +207,22 @@ export function ScanDetailModal({
       title={
         activeTab === "heatmap"
           ? "Visual Accessibility Heatmap"
+          : activeTab === "screen_reader"
+          ? "Screen Reader Reading Simulator"
           : activeTab === "investigations"
           ? "Autonomous Accessibility Investigation"
           : "Audit Execution Telemetry"
       }
       description={`Real-time Playwright execution logs, coordinate telemetry, and axe-core audit results for ${scan?.target_url || ""}`}
-      className={activeTab === "heatmap" || activeTab === "investigations" ? "max-w-5xl" : "max-w-2xl"}
+      className={activeTab !== "telemetry" ? "max-w-5xl" : "max-w-2xl"}
     >
       <div className="space-y-4 pt-2">
         {/* Navigation Tabs */}
-        <div className="flex border-b border-[#303741] pb-2 gap-2">
+        <div className="flex border-b border-[#303741] pb-2 gap-2 overflow-x-auto">
           <button
             type="button"
             onClick={() => setActiveTab("telemetry")}
-            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
               activeTab === "telemetry"
                 ? "bg-[#252C35] text-[#38BDF8]"
                 : "text-[#9CA3AF] hover:text-[#F3F4F6]"
@@ -228,7 +234,7 @@ export function ScanDetailModal({
           <button
             type="button"
             onClick={() => setActiveTab("heatmap")}
-            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
               activeTab === "heatmap"
                 ? "bg-[#252C35] text-[#38BDF8]"
                 : "text-[#9CA3AF] hover:text-[#F3F4F6]"
@@ -244,8 +250,20 @@ export function ScanDetailModal({
           </button>
           <button
             type="button"
+            onClick={() => setActiveTab("screen_reader")}
+            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
+              activeTab === "screen_reader"
+                ? "bg-[#252C35] text-[#38BDF8]"
+                : "text-[#9CA3AF] hover:text-[#F3F4F6]"
+            }`}
+          >
+            <Volume2 className="h-4 w-4" />
+            <span>Screen Reader Preview</span>
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab("investigations")}
-            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
               activeTab === "investigations"
                 ? "bg-[#252C35] text-[#38BDF8]"
                 : "text-[#9CA3AF] hover:text-[#F3F4F6]"
@@ -281,9 +299,23 @@ export function ScanDetailModal({
               }
             }}
           />
+        ) : activeTab === "screen_reader" ? (
+          <ScreenReaderSimulator
+            scanId={scanId!}
+            pages={pages}
+            selectedPageId={selectedPageId}
+            onSelectPage={setSelectedPageId}
+            onInspectFinding={(findingId) => {
+              if (onInspectFinding) {
+                onInspectFinding(findingId);
+                onClose();
+              }
+            }}
+          />
         ) : activeTab === "investigations" ? (
           <AutonomousInvestigationPanel scanId={scanId!} />
         ) : (
+
 
           <>
             {/* Status & Engine Header */}

@@ -59,6 +59,36 @@ def save_remediation_screenshot(
     return f"remediations/{remediation_id}/{filename}"
 
 
+def save_screen_reader_simulation(
+
+    scan_id: uuid.UUID,
+    page_id: uuid.UUID,
+    simulation_json: str,
+) -> str:
+    """Save screen reader simulation JSON to storage root and return relative storage key."""
+    storage_root = get_storage_root()
+    sim_dir = storage_root / "simulations" / str(scan_id)
+    sim_dir.mkdir(parents=True, exist_ok=True)
+
+    filename = f"{page_id}_sr.json"
+    file_path = sim_dir / filename
+    file_path.write_text(simulation_json, encoding="utf-8")
+
+    return f"simulations/{scan_id}/{filename}"
+
+
+def load_screen_reader_simulation(
+    scan_id: uuid.UUID,
+    page_id: uuid.UUID,
+) -> str | None:
+    """Load cached screen reader simulation JSON from storage root if available."""
+    storage_root = get_storage_root()
+    file_path = storage_root / "simulations" / str(scan_id) / f"{page_id}_sr.json"
+    if file_path.is_file():
+        return file_path.read_text(encoding="utf-8")
+    return None
+
+
 def resolve_artifact_path(storage_key: str) -> Path | None:
     """Safely resolve an artifact storage key preventing path traversal."""
     if not storage_key or ".." in storage_key or storage_key.startswith(("/", "\\")):
