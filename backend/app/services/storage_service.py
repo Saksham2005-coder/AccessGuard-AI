@@ -89,6 +89,35 @@ def load_screen_reader_simulation(
     return None
 
 
+def save_keyboard_test(
+    scan_id: uuid.UUID,
+    page_id: uuid.UUID,
+    report_json: str,
+) -> str:
+    """Save keyboard navigation test report JSON to storage root safely."""
+    storage_root = get_storage_root()
+    kb_dir = storage_root / "keyboard_tests" / str(scan_id)
+    kb_dir.mkdir(parents=True, exist_ok=True)
+
+    filename = f"{page_id}_kb.json"
+    file_path = kb_dir / filename
+    file_path.write_text(report_json, encoding="utf-8")
+
+    return f"keyboard_tests/{scan_id}/{filename}"
+
+
+def load_keyboard_test(
+    scan_id: uuid.UUID,
+    page_id: uuid.UUID,
+) -> str | None:
+    """Load cached keyboard navigation test report JSON from storage root if available."""
+    storage_root = get_storage_root()
+    file_path = storage_root / "keyboard_tests" / str(scan_id) / f"{page_id}_kb.json"
+    if file_path.is_file():
+        return file_path.read_text(encoding="utf-8")
+    return None
+
+
 def resolve_artifact_path(storage_key: str) -> Path | None:
     """Safely resolve an artifact storage key preventing path traversal."""
     if not storage_key or ".." in storage_key or storage_key.startswith(("/", "\\")):

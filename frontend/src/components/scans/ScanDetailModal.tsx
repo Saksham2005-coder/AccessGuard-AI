@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   MapPin,
   Volume2,
+  Keyboard,
 } from "lucide-react";
 
 
@@ -24,6 +25,7 @@ import {
 import { VisualHeatmapViewer } from "../heatmap/VisualHeatmapViewer";
 import { AutonomousInvestigationPanel } from "../investigations/AutonomousInvestigationPanel";
 import { ScreenReaderSimulator } from "../screenreader/ScreenReaderSimulator";
+import { KeyboardNavigator } from "../keyboard/KeyboardNavigator";
 
 export interface ScanDetailModalProps {
   scanId: string | null;
@@ -43,7 +45,7 @@ export function ScanDetailModal({
   const [scan, setScan] = useState<Scan | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"telemetry" | "heatmap" | "screen_reader" | "investigations">("telemetry");
+  const [activeTab, setActiveTab] = useState<"telemetry" | "heatmap" | "screen_reader" | "keyboard" | "investigations">("telemetry");
 
 
 
@@ -209,6 +211,8 @@ export function ScanDetailModal({
           ? "Visual Accessibility Heatmap"
           : activeTab === "screen_reader"
           ? "Screen Reader Reading Simulator"
+          : activeTab === "keyboard"
+          ? "Deterministic Keyboard Navigation Test"
           : activeTab === "investigations"
           ? "Autonomous Accessibility Investigation"
           : "Audit Execution Telemetry"
@@ -262,6 +266,18 @@ export function ScanDetailModal({
           </button>
           <button
             type="button"
+            onClick={() => setActiveTab("keyboard")}
+            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
+              activeTab === "keyboard"
+                ? "bg-[#252C35] text-[#38BDF8]"
+                : "text-[#9CA3AF] hover:text-[#F3F4F6]"
+            }`}
+          >
+            <Keyboard className="h-4 w-4" />
+            <span>Keyboard Test</span>
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab("investigations")}
             className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
               activeTab === "investigations"
@@ -311,6 +327,13 @@ export function ScanDetailModal({
                 onClose();
               }
             }}
+          />
+        ) : activeTab === "keyboard" ? (
+          <KeyboardNavigator
+            scanId={scanId!}
+            pages={pages}
+            selectedPageId={selectedPageId}
+            onSelectPage={setSelectedPageId}
           />
         ) : activeTab === "investigations" ? (
           <AutonomousInvestigationPanel scanId={scanId!} />

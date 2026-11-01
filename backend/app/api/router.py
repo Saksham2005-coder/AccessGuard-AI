@@ -7,6 +7,7 @@ from app.api.v1 import (
     findings,
     health,
     investigations,
+    keyboard,
     knowledge,
     projects,
     remediations,
@@ -16,7 +17,7 @@ from app.api.v1 import (
 
 api_v1_router = APIRouter()
 
-# Mount health checks, authentication, project management, scan, findings, knowledge, remediation, investigation, and screen reader routes
+# Mount health checks, authentication, project management, scan, findings, knowledge, remediation, investigation, screen reader, and keyboard routes
 api_v1_router.include_router(health.router)
 api_v1_router.include_router(auth.router)
 api_v1_router.include_router(projects.router)
@@ -26,5 +27,6 @@ api_v1_router.include_router(knowledge.router)
 api_v1_router.include_router(remediations.router)
 api_v1_router.include_router(investigations.router)
 api_v1_router.include_router(screen_reader.router)
+api_v1_router.include_router(keyboard.router)
 
 
