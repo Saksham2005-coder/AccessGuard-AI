@@ -6,6 +6,7 @@ import {
   Calendar,
   ExternalLink,
   FolderKanban,
+  GitPullRequest,
   Globe,
   Plus,
   ShieldAlert,
@@ -25,12 +26,15 @@ import {
 } from "../api/projects";
 import { CreateProjectModal } from "../components/projects/CreateProjectModal";
 import { DomainVerificationModal } from "../components/projects/DomainVerificationModal";
+import { GitHubIntegrationModal } from "../components/github/GitHubIntegrationModal";
 
 export function ProjectsPage() {
   const queryClient = useQueryClient();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isVerificationOpen, setIsVerificationOpen] = useState(false);
+  const [selectedGitHubProject, setSelectedGitHubProject] = useState<Project | null>(null);
+  const [isGitHubOpen, setIsGitHubOpen] = useState(false);
 
   const {
     data: projectsData,
@@ -220,6 +224,20 @@ export function ProjectsPage() {
                           <span>Scans</span>
                         </Button>
                       </Link>
+
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedGitHubProject(project);
+                          setIsGitHubOpen(true);
+                        }}
+                        className="text-xs gap-1.5"
+                        title="Configure GitHub PR accessibility reviews"
+                      >
+                        <GitPullRequest className="h-3.5 w-3.5 text-[#38BDF8]" />
+                        <span>GitHub PRs</span>
+                      </Button>
                     </div>
 
                     <button
@@ -258,6 +276,16 @@ export function ProjectsPage() {
           setSelectedProject(null);
         }}
         onProjectUpdated={handleProjectUpdated}
+      />
+
+      {/* GitHub Integration Modal */}
+      <GitHubIntegrationModal
+        project={selectedGitHubProject}
+        isOpen={isGitHubOpen}
+        onClose={() => {
+          setIsGitHubOpen(false);
+          setSelectedGitHubProject(null);
+        }}
       />
     </div>
   );
