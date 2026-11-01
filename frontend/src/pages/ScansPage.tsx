@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Activity,
   AlertTriangle,
+  Bot,
   ExternalLink,
   History,
   Play,
@@ -20,6 +21,7 @@ import { listProjectScansApi, Scan } from "../api/scans";
 import { CreateScanModal } from "../components/scans/CreateScanModal";
 import { ScanDetailModal } from "../components/scans/ScanDetailModal";
 import { RegressionMonitoringModal } from "../components/regression/RegressionMonitoringModal";
+import { AssistantChatModal } from "../components/assistant/AssistantChatModal";
 
 export function ScansPage() {
   const navigate = useNavigate();
@@ -29,6 +31,8 @@ export function ScansPage() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [regressionScan, setRegressionScan] = useState<Scan | null>(null);
   const [isRegressionOpen, setIsRegressionOpen] = useState(false);
+  const [assistantScan, setAssistantScan] = useState<Scan | null>(null);
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<string>("");
 
   // Fetch available projects
@@ -271,19 +275,35 @@ export function ScansPage() {
                             <span>View Telemetry</span>
                           </Button>
                           {isCompleted && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setRegressionScan(scan);
-                                setIsRegressionOpen(true);
-                              }}
-                              className="text-xs gap-1.5 text-indigo-400 border-indigo-900/40 hover:bg-indigo-950/20"
-                            >
-                              <History className="h-3.5 w-3.5 text-indigo-400" />
-                              <span>Regressions</span>
-                            </Button>
+                            <>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setAssistantScan(scan);
+                                  setIsAssistantOpen(true);
+                                }}
+                                className="text-xs gap-1.5 text-blue-400 border-blue-900/40 hover:bg-blue-950/20"
+                              >
+                                <Bot className="h-3.5 w-3.5 text-blue-400" />
+                                <span>AI Assistant</span>
+                              </Button>
+
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setRegressionScan(scan);
+                                  setIsRegressionOpen(true);
+                                }}
+                                className="text-xs gap-1.5 text-indigo-400 border-indigo-900/40 hover:bg-indigo-950/20"
+                              >
+                                <History className="h-3.5 w-3.5 text-indigo-400" />
+                                <span>Regressions</span>
+                              </Button>
+                            </>
                           )}
                         </div>
                       </td>
@@ -332,6 +352,20 @@ export function ScansPage() {
           projectId={activeProjectId}
           currentScan={regressionScan}
           availableScans={scans}
+        />
+      )}
+
+      {/* Conversational Accessibility Assistant Modal */}
+      {assistantScan && (
+        <AssistantChatModal
+          isOpen={isAssistantOpen}
+          onClose={() => {
+            setIsAssistantOpen(false);
+            setAssistantScan(null);
+          }}
+          projectId={activeProjectId}
+          scanId={assistantScan.id}
+          targetUrl={assistantScan.target_url}
         />
       )}
     </div>

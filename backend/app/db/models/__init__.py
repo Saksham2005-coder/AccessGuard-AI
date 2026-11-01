@@ -1,4 +1,5 @@
 from app.db.models.agent_run import AgentRun
+from app.db.models.assistant import AssistantConversation, AssistantMessage
 from app.db.models.domain_verification import ProjectDomainVerification
 from app.db.models.finding import Finding, FindingNode
 from app.db.models.github import GitHubIntegration, GitHubReviewRecord
@@ -14,6 +15,8 @@ from app.db.models.user import User
 
 __all__ = [
     "AgentRun",
+    "AssistantConversation",
+    "AssistantMessage",
     "Finding",
     "FindingNode",
     "GitHubIntegration",
