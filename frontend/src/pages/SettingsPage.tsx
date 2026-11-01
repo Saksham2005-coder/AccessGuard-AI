@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Database,
@@ -16,6 +17,11 @@ import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { useAuthStore } from "../store/authStore";
 import { updateProfileApi, changePasswordApi } from "../api/auth";
+
+interface ApiErrorData {
+  error?: { message?: string };
+  detail?: Array<{ msg?: string }>;
+}
 
 export function SettingsPage() {
   const { user } = useAuthStore();
@@ -45,8 +51,14 @@ export function SettingsPage() {
       setProfileErrorMsg(null);
       setIsEditingProfile(false);
     },
-    onError: (err: any) => {
-      setProfileErrorMsg(err?.response?.data?.error?.message || err.message || "Failed to update profile.");
+    onError: (err: unknown) => {
+      let message = "Failed to update profile.";
+      if (axios.isAxiosError<ApiErrorData>(err)) {
+        message = err.response?.data?.error?.message || err.message || message;
+      } else if (err instanceof Error) {
+        message = err.message;
+      }
+      setProfileErrorMsg(message);
       setProfileSuccessMsg(null);
     },
   });
@@ -66,13 +78,18 @@ export function SettingsPage() {
       setNewPassword("");
       setConfirmPassword("");
     },
-    onError: (err: any) => {
-      setPasswordErrorMsg(
-        err?.response?.data?.error?.message ||
-          err?.response?.data?.detail?.[0]?.msg ||
+    onError: (err: unknown) => {
+      let message = "Failed to change password.";
+      if (axios.isAxiosError<ApiErrorData>(err)) {
+        message =
+          err.response?.data?.error?.message ||
+          err.response?.data?.detail?.[0]?.msg ||
           err.message ||
-          "Failed to change password."
-      );
+          message;
+      } else if (err instanceof Error) {
+        message = err.message;
+      }
+      setPasswordErrorMsg(message);
       setPasswordSuccessMsg(null);
     },
   });
