@@ -330,6 +330,7 @@ The technical debt closure has been executed via small, atomic commits on the `m
 | `b287c59` | `fix(typing): resolve all 27 mypy errors across backend codebase` | Resolved 27 Mypy typing errors across 11 files |
 | `2e28421` | `fix(frontend): resolve ESLint errors and decouple ThemeContext provider` | ESLint typing fix & ThemeContext/Provider split |
 | `8e9229d` | `feat(health): implement asynchronous readiness checks for postgres and redis` | Real async database & redis connectivity probes |
+| `e808d48` | `docs(phase-18-1): add final technical debt closure report` | Phase 18.1 technical debt report |
 
 ---
 
