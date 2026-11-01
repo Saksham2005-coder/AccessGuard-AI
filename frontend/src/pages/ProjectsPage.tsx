@@ -27,6 +27,7 @@ import {
 import { CreateProjectModal } from "../components/projects/CreateProjectModal";
 import { DomainVerificationModal } from "../components/projects/DomainVerificationModal";
 import { GitHubIntegrationModal } from "../components/github/GitHubIntegrationModal";
+import { CompliancePassportModal } from "../components/passport/CompliancePassportModal";
 
 export function ProjectsPage() {
   const queryClient = useQueryClient();
@@ -35,6 +36,8 @@ export function ProjectsPage() {
   const [isVerificationOpen, setIsVerificationOpen] = useState(false);
   const [selectedGitHubProject, setSelectedGitHubProject] = useState<Project | null>(null);
   const [isGitHubOpen, setIsGitHubOpen] = useState(false);
+  const [selectedPassportProject, setSelectedPassportProject] = useState<Project | null>(null);
+  const [isPassportOpen, setIsPassportOpen] = useState(false);
 
   const {
     data: projectsData,
@@ -238,6 +241,21 @@ export function ProjectsPage() {
                         <GitPullRequest className="h-3.5 w-3.5 text-[#38BDF8]" />
                         <span>GitHub PRs</span>
                       </Button>
+
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedPassportProject(project);
+                          setIsPassportOpen(true);
+                        }}
+                        className="text-xs gap-1.5 text-sky-400 border-sky-900/40 hover:bg-sky-950/20"
+                        title="Accessibility Compliance Passport"
+                        data-testid={`passport-btn-${project.id}`}
+                      >
+                        <ShieldCheck className="h-3.5 w-3.5 text-sky-400" />
+                        <span>Passport</span>
+                      </Button>
                     </div>
 
                     <button
@@ -287,6 +305,20 @@ export function ProjectsPage() {
           setSelectedGitHubProject(null);
         }}
       />
+
+      {/* Compliance Passport Modal */}
+      {selectedPassportProject && (
+        <CompliancePassportModal
+          isOpen={isPassportOpen}
+          onClose={() => {
+            setIsPassportOpen(false);
+            setSelectedPassportProject(null);
+          }}
+          projectId={selectedPassportProject.id}
+          projectName={selectedPassportProject.name}
+          baseDomain={selectedPassportProject.base_domain}
+        />
+      )}
     </div>
   );
 }

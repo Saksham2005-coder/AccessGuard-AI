@@ -4,6 +4,7 @@ from app.db.models.domain_verification import ProjectDomainVerification
 from app.db.models.finding import Finding, FindingNode
 from app.db.models.github import GitHubIntegration, GitHubReviewRecord
 from app.db.models.knowledge import KnowledgeChunk, KnowledgeSource
+from app.db.models.passport import CompliancePassport
 from app.db.models.project import Project
 from app.db.models.refresh_session import RefreshSession
 from app.db.models.regression import InAppNotification, ProjectBaseline, ScanSchedule
@@ -18,6 +19,7 @@ __all__ = [
     "AgentRun",
     "AssistantConversation",
     "AssistantMessage",
+    "CompliancePassport",
     "Finding",
     "FindingNode",
     "GitHubIntegration",

@@ -5,6 +5,7 @@ import {
   FileText,
   Printer,
   Shield,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { Card, CardContent } from "../components/ui/Card";
@@ -13,9 +14,11 @@ import { EmptyState } from "../components/ui/EmptyState";
 import { listProjectsApi } from "../api/projects";
 import { listProjectScansApi } from "../api/scans";
 import { listFindingsApi } from "../api/findings";
+import { CompliancePassportModal } from "../components/passport/CompliancePassportModal";
 
 export function ReportsPage() {
   const [selectedProjectId, setSelectedProjectId] = useState<string>("");
+  const [isPassportOpen, setIsPassportOpen] = useState(false);
 
   const { data: projectsData, isLoading: projectsLoading } = useQuery({
     queryKey: ["projects"],
@@ -192,6 +195,16 @@ export function ReportsPage() {
             <Printer className="h-3.5 w-3.5" />
             <span>Print Report</span>
           </Button>
+
+          <Button
+            size="sm"
+            onClick={() => setIsPassportOpen(true)}
+            className="gap-1.5 text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white"
+            data-testid="open-passport-btn"
+          >
+            <ShieldCheck className="h-3.5 w-3.5" />
+            <span>Compliance Passport</span>
+          </Button>
         </div>
       </div>
 
@@ -314,6 +327,17 @@ export function ReportsPage() {
           </div>
         </div>
       </div>
+
+      {/* Compliance Passport Modal */}
+      {activeProject && (
+        <CompliancePassportModal
+          isOpen={isPassportOpen}
+          onClose={() => setIsPassportOpen(false)}
+          projectId={activeProject.id}
+          projectName={activeProject.name}
+          baseDomain={activeProject.base_domain}
+        />
+      )}
     </div>
   );
 }

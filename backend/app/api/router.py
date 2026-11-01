@@ -11,6 +11,7 @@ from app.api.v1 import (
     investigations,
     keyboard,
     knowledge,
+    passports,
     projects,
     regression,
     remediations,
@@ -21,7 +22,7 @@ from app.api.v1 import (
 
 api_v1_router = APIRouter()
 
-# Mount health checks, auth, projects, scans, findings, knowledge, remediations, investigations, screen reader, keyboard, regression, github, assistant, and responsive routes
+# Mount all domain routers
 api_v1_router.include_router(health.router)
 api_v1_router.include_router(auth.router)
 api_v1_router.include_router(projects.router)
@@ -36,6 +37,7 @@ api_v1_router.include_router(regression.router)
 api_v1_router.include_router(github.router)
 api_v1_router.include_router(assistant.router)
 api_v1_router.include_router(responsive.router)
+api_v1_router.include_router(passports.router)
 
 
 
